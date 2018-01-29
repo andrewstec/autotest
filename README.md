@@ -1,6 +1,6 @@
 # AutoTest
 
-Runs Docker container instances that grade student code for particular classes. Leaves Github comments online with grade information when requested in a comment such as `@autobot d1` by a student on a comment underneath a commit on Github online.
+Runs Docker container instances that grade student code for particular classes. Leaves Github comments online with Docker container result information when requested in a comment such as `@autobot #d1` by a student on a comment underneath a commit on Github online.
 
 Requirements
 -------------
