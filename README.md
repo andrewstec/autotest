@@ -8,20 +8,17 @@ Requirements
 - 'autotest.env' file in `./autotest/` directory: 
 
 ```
-	DB_INSTANCE=http://localhost:11312 (old couchDB address)
-	DB_ADMIN_USERNAME=CouchDBAdminUserName
-	DB_ADMIN_PASSWORD=CouchDBAdminPassWord
-	DB_APP_USERNAME=autotest
-	DB_APP_PASSWORD=CouchDBRootPassword
 	GITHUB_API_KEY=LONGSTRING
-	REDIS_ADDRESS=http://localhost:6379
+	REDIS_ADDRESS=http://localhost
 	SSL_CERT=/path/to/crt.crt
 	SSL_KEY=/path/to/key.key
 	SSL_INT_CERT=/path/to/-cacerts.pem
-	COURSES=210 310, etc.
-	DEV_MONGO_DB_INSTANCE=mongodb://localhost:27017/development
-	PROD_MONGO_DB_INSTANCE=mongodb://localhost:27017/production
-	TEST_MONGO_DB_INSTANCE=mongodb://localhost:27017/testing
+	COURSES=210 310 etc.
+	DEV_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/development
+	PROD_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/production
+	TEST_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/testing
+	MENTIONED_TAG=@autobot
+	
 ```
 
 - `yarn run install` with original lockfile and then `yarn run build`
