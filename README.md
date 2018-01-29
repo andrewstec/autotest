@@ -4,7 +4,10 @@ CPSC 310 submission service.
 Requirements
 -------------
 
-- Docker version 17.03.1-ce, build c6d412e (any close version will do)
+- MongoDB db version v3.4.7 (any close version)
+- Node JS v6.11.0 LTS (higher will likely work)
+- Yarn 0.24.6 (any close version)
+- Docker version 17.03.1-ce, build c6d412e (any close version)
 - 'autotest.env' file in `./autotest/` directory: 
 
 ```
