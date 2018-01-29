@@ -24,7 +24,7 @@ Requirements
 	
 ```
 
-- `yarn run install` with original lockfile and then `yarn run build`
+- In dir path, `yarn run install` with original lockfile and then `yarn run build`
 - GITHUB_API_KEY may be created on Github under 'Settings' with permissions to manage orgs, repos, repo_hooks, and users.
 
 Start Instructions
