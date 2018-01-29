@@ -25,11 +25,12 @@ Requirements
 ```
 
 - `yarn run install` with original lockfile and then `yarn run build`
+- GITHUB_API_KEY may be created on Github under 'Settings' with permissions to manage orgs, repos, repo_hooks, and users.
 
 Start Instructions
 ----------------------
 
-- `./deploy.sh` Install required Docker instances.
+- `./deploy.sh` Install required Docker instances (must be run after COURSES env set)
 - `./autotest/docker/tester/docker-up.sh` Build required per-course Docker containers.
 - `yarn run start` Start AutoTest service.
 
