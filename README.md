@@ -20,7 +20,7 @@ Requirements
 	DEV_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/development
 	PROD_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/production
 	TEST_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/testing
-	MENTIONED_TAG=@autobot
+	MENTION_TAG=@autobot
 	
 ```
 
