@@ -82,11 +82,11 @@ export default class CommitCommentRecord {
         that.repo = payload.repository.name;
         that.hook = Url.parse(payload.repository.commits_url.replace('{/sha}', '/' + this.commit) + '/comments');
         that.message = payload.comment.body;
-        that.isRequest = payload.comment.body.toLowerCase().includes(this.config.getMentionTag() && this.user !== 'autobot');
+        that.isRequest = (payload.comment.body.toLowerCase().includes(this.config.getMentionTag()) && this.user !== 'autobot');
         that.isProcessed = false;
         if (that.isRequest) {
           that.options = this.extractOptions(this.message);
-          let reqDeliverable: string = this.options[0];//that.extractDeliverable(that.message);
+          let reqDeliverable: string = this.options[0];
           let deliverable: FetchedDeliverable = await that.fetchDeliverable(reqDeliverable, this.courseNum);
           that.deliverable = deliverable.key;
           that.deliverableRate = deliverable.deliverable.rate;
