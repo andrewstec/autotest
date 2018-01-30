@@ -1,35 +1,37 @@
 # AutoTest
-CPSC 310 submission service.
+
+Runs Docker container instances that grade student code for particular classes. Leaves Github comments online with Docker container result information when requested in a comment such as `@autobot #d1` by a student on a comment underneath a commit on Github online.
 
 Requirements
 -------------
 
-- Docker version 17.03.1-ce, build c6d412e (any close version will do)
+- MongoDB db version v3.4.7 (any close version)
+- Node JS v6.11.0 LTS (higher will likely work)
+- Yarn 0.24.6 (any close version)
+- Docker version 17.03.1-ce, build c6d412e (any close version)
 - 'autotest.env' file in `./autotest/` directory: 
 
 ```
-	DB_INSTANCE=http://localhost:11312 (old couchDB address)
-	DB_ADMIN_USERNAME=CouchDBAdminUserName
-	DB_ADMIN_PASSWORD=CouchDBAdminPassWord
-	DB_APP_USERNAME=autotest
-	DB_APP_PASSWORD=CouchDBRootPassword
 	GITHUB_API_KEY=LONGSTRING
-	REDIS_ADDRESS=http://localhost:6379
+	REDIS_ADDRESS=http://localhost
 	SSL_CERT=/path/to/crt.crt
 	SSL_KEY=/path/to/key.key
 	SSL_INT_CERT=/path/to/-cacerts.pem
-	COURSES=210 310, etc.
-	DEV_MONGO_DB_INSTANCE=mongodb://localhost:27017/development
-	PROD_MONGO_DB_INSTANCE=mongodb://localhost:27017/production
-	TEST_MONGO_DB_INSTANCE=mongodb://localhost:27017/testing
+	COURSES=210 310 etc.
+	DEV_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/development
+	PROD_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/production
+	TEST_MONGO_DB_INSTANCE=mongodb://username:password@localhost:27017/testing
+	MENTION_TAG=@autobot
+	
 ```
 
-- `yarn run install` with original lockfile and then `yarn run build`
+- In dir path, `yarn run install` with original lockfile and then `yarn run build`
+- GITHUB_API_KEY may be created on Github under 'Settings' with permissions to manage orgs, repos, repo_hooks, and users.
 
 Start Instructions
 ----------------------
 
-- `./deploy.sh` Install required Docker instances.
+- `./deploy.sh` Install required Docker instances (must be run after COURSES env set)
 - `./autotest/docker/tester/docker-up.sh` Build required per-course Docker containers.
 - `yarn run start` Start AutoTest service.
 
