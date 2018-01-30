@@ -21,12 +21,6 @@ import DeliverableRepo from '../../repos/DeliverableRepo';
 import {Deliverable} from '../../model/settings/DeliverableRecord';
 import CourseRepo from '../../repos/CourseRepo';
 
-
-const COURSE_210: number = 210;
-const COURSE_310: number = 310;
-const IMAGE_NAME_310: string = 'cpsc310__bootstrap';
-const IMAGE_NAME_210: string = 'cpsc210__bootstrap';
-
 export interface PendingRequest {
   requestor: string;
   commit: string;
@@ -54,15 +48,6 @@ export default class CommitCommentContoller {
   constructor(courseNum: number) {
     this.config = new AppConfig();
     this.courseNum = courseNum;
-  }
-
-  private getImageName(): string {
-    switch (this.courseNum) {
-      case COURSE_210:
-        return IMAGE_NAME_210;
-      case COURSE_310:
-        return IMAGE_NAME_310;
-    }
   }
 
   async process(data: JSON): Promise<GithubResponse> {
@@ -164,7 +149,6 @@ export default class CommitCommentContoller {
                   let maxPos: number = await that.isQueued(deliv, record.getTeam(), record.getCommit())
                   let body: string;
                   try {
-                    let imageName = this.getImageName();
                     let jobIdData: JobIdData = { 
                         dockerImage: deliv.dockerImage,
                         dockerBuild: deliv.dockerBuild,
@@ -176,7 +160,7 @@ export default class CommitCommentContoller {
                     await redis.client.set(reqId, req);
                     await queue.promoteJob(jobId, jobIdData, redis.client);
 
-                    body = 'This commit is still queued for processing against **'+deliverable+'**. Your results will be posted here as soon as they are ready.' + (this.record.getNote() ? '\n_Note: ' + this.record.getNote() + '_' : '');// There are ' + maxPos + (maxPos > 1 ? ' jobs' : ' job') + ' queued.';
+                    body = 'This commit is still queued for processing against **'+deliverable+'**. Your results will be posted here as soon as they are ready.' + (this.record.getNote() ? '\n_Note: ' + this.record.getNote() + '_' : '');
                   } catch(err) {
                     body = 'This commit is still queued for processing against **'+deliverable+'**. Please try again in a few minutes.';
                   }
@@ -215,7 +199,6 @@ export default class CommitCommentContoller {
           }
         }
 
-
         try {
           await that.store(record);
         } catch(err) {
@@ -233,9 +216,8 @@ export default class CommitCommentContoller {
   }
 
   /**
-   * Checks to see if the user is in the admin list in the database.
-   *
-   *  @param user
+   * Checks to see if the user is in the admin or staff list in the Course
+   *  @param user string username
    *  @return true if admin or staff authenticated
    */
   private async isAdminOrStaff(user: string): Promise<boolean> {
@@ -281,7 +263,6 @@ export default class CommitCommentContoller {
   private async isQueued(deliverable: Deliverable, team: string, commit: Commit): Promise<number> {
     //  jobId: job.test.image + '|'  + job.team + '#' + job.commit,
     return new Promise<number>((fulfill, reject) => {
-      let imageName = this.getImageName();
       let jobId: string = deliverable.dockerImage + ':' + deliverable.dockerBuild + '|' + deliverable.name + '-' + team + '#' + commit.short;
       let queue: TestJobController = TestJobController.getInstance(this.courseNum);
 
@@ -341,8 +322,6 @@ export default class CommitCommentContoller {
     let resultRecordRepo: ResultRecordRepo = new ResultRecordRepo();    
     
     if (_record.getIsProcessed() && _record.getIsRequest()) {
-      
-
       return resultRecordRepo.addGradeRequestedInfo(commitUrl, requestor)
       .then((fulfilledResponse) => {
         // If results found, update ResultRecords with true/false isProcessed and isRequest statuses
@@ -351,10 +330,6 @@ export default class CommitCommentContoller {
         // throw `CommitCommentController:: addGradeRequestedStatus() No ResultRecords could be found for Commit ${commit}`;
       });
     }
-
-
-
-
   }
 
   /**
@@ -364,7 +339,6 @@ export default class CommitCommentContoller {
    */
   private async store(record: CommitCommentRecord) {
     let commitCommentRepo: RequestRepo = new RequestRepo();
-    
     return commitCommentRepo.insertCommitComment(record.convertToJSON())
       .then((fulfilledResponse) => {
         if (fulfilledResponse.insertedCount > 0) {

@@ -82,8 +82,7 @@ export default class CommitCommentRecord {
         that.repo = payload.repository.name;
         that.hook = Url.parse(payload.repository.commits_url.replace('{/sha}', '/' + this.commit) + '/comments');
         that.message = payload.comment.body;
-
-        that.isRequest = payload.comment.body.toLowerCase().includes(this.config.getMentionTag());
+        that.isRequest = payload.comment.body.toLowerCase().includes(this.config.getMentionTag() && this.user !== 'autobot');
         that.isProcessed = true;
         if (that.isRequest) {
           that.options = this.extractOptions(this.message);
