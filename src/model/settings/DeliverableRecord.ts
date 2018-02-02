@@ -15,31 +15,25 @@ export interface Deliverable {
   open: number;
   close: number;
   name: string;
+  customHtml: boolean;
   buildingRepos: string;
   courseId: string;
   gradesReleased: boolean;
   projectCount: number;
   teamsInSameLab: boolean;
+  studentsMakeTeams: boolean;
   teamsAllowed: boolean;
   postbackOnComplete: boolean;
   maxTeamSize: number;
   minTeamSize: number;
+  dockerOverride: boolean;
   dockerImage: string;
   dockerBuild: string;
+  containerBuilt: boolean;
   allowDNS: number;
   whitelistedServers: string;
   custom: object;
   rate: number;
-  htmlOutput: boolean;
-  // description?: string
-  // dueDate: Date;
-  // releaseDate: Date;
-  // repos: Repository[];
-  // gradeFormula: string;
-  // rate: number;  // milliseconds
-  // runs?: number;  // total number of requests to view test results
-  // // external servers that should be accessible inside the test container
-  // externalUrls?: Url.Url[];
 }
 
 export enum Visibility {

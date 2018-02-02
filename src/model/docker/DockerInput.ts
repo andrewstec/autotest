@@ -24,6 +24,8 @@ export interface DockerInputJSON {
   allowDNS: number;
   courseNum: number;
   stdioRef: string;
+  customHtml: boolean;
+  rate: number;
   teamId: string;
   container: DockerContainerInfo;
   custom: object;
@@ -124,6 +126,8 @@ export default class DockerInput {
         whitelistedServers: null,
         githubOrg: null, 
         custom: null, 
+        customHtml: null,
+        rate: null,
         teamId: null,
         courseNum: null,
         postbackOnComplete: null,
@@ -167,6 +171,8 @@ export default class DockerInput {
           dockerInput.teamId = this.pushRecord.team;
           dockerInput.whitelistedServers = this.deliverable.whitelistedServers;
           dockerInput.allowDNS = this.deliverable.allowDNS;
+          dockerInput.customHtml = this.deliverable.customHtml;
+          dockerInput.rate = this.deliverable.rate;
           dockerInput.custom = this.deliverable.custom;
           dockerInput.courseNum = this.courseNum;          
           dockerInput.githubOrg = this.pushRecord.githubOrg;

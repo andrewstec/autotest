@@ -64,7 +64,7 @@ export default class StaticHtml {
       return extract(zipFilePath, {dir: path}, function (err) {
         if (err) {
           Log.error('StaticHtmlController:: extractZipToDir() ERROR ' + err);
-          reject('Error creating Static Html Hyperlink');
+          reject('Error creating Static Html Hyperlink ' + err);
         } else {
           Log.info('StaticHtmlController:: extractZipToDir() SUCCESS Extracted StaticHtml to ' + path);
           fulfill('https://portal.cs.ubc.ca/static/' + that.newDirPath + '/html/');
