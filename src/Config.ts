@@ -15,6 +15,7 @@ export interface IConfig {
   getSSLKeyPath(): string;
   getSSLCertPath(): string;
   getSSLIntCertPath(): string;
+  getStaticHtmlPath(): string;
   getMongoAddress(): string;
   getCourseNums(): [number];
   getDebugMode(): boolean;
@@ -35,6 +36,7 @@ class Config {
   private sslKeyPath: string;
   private sslCertPath: string;
   private sslIntCertPath: string;
+  private staticHtmlPath: string;
   private mongoDB: string;
   private debugMode: boolean;
 
@@ -47,6 +49,7 @@ class Config {
     let dbInstance = process.env.DB_INSTANCE || 'http://localhost:5984';
     let dbAppUser = process.env.DB_APP_USERNAME;
     let dbAppPass = process.env.DB_APP_PASSWORD;
+    let staticHtmlPath = process.env.STATIC_HTML_PATH;
     let redisAddress = process.env.REDIS_ADDRESS || 'http://localhost:6379';
     let mentionTag = process.env.MENTION_TAG || '@autobot';
     let githubToken = process.env.GITHUB_API_KEY;
@@ -59,6 +62,7 @@ class Config {
     this.redisAddress = Url.parse(redisAddress);
     this.mentionTag = mentionTag;
     this.githubToken = githubToken;
+    this.staticHtmlPath = staticHtmlPath;
     this.sslKeyPath = sslKeyPath;
     this.sslCertPath = sslCertPath;
     this.sslIntCertPath = sslIntCertPath;
@@ -106,6 +110,10 @@ class Config {
 
   public getSSLIntCertPath(): string {
     return this.sslIntCertPath;
+  }
+
+  public getStaticHtmlPath(): string {
+    return this.staticHtmlPath;
   }
 
   public getAppPort(): number {
@@ -178,4 +186,7 @@ export class AppConfig implements IConfig {
   public getSSLIntCertPath(): string {
     return Config.getInstance().getSSLIntCertPath();
   }  
+  public getStaticHtmlPath(): string {
+    return Config.getInstance().getStaticHtmlPath();
+  }
 }
