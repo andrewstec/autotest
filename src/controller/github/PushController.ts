@@ -20,6 +20,7 @@ export default class PushController {
   private runningPort: number;
   private deliverable: Deliverable;
   private courseNum: number;
+  private course: Course;
   private record: PushRecord;
   private dockerHelper: DockerHelper;
   private dockerInput: DockerInputJSON;
@@ -34,8 +35,9 @@ export default class PushController {
     this.record = new PushRecord(data);
     await this.store(this.record);
 
-    this.deliverable = await this.getDeliverableLogic();
-    this.dockerHelper = await new DockerHelper(this.deliverable, this.record, this.courseNum);
+    this.deliverable = await this.getDeliverable();
+    this.course = await this.getCourse();
+    this.dockerHelper = await new DockerHelper(this.deliverable, this.record, this.course);
     this.dockerInput = await this.dockerHelper.createDockerInputJSON();
 
     if (this.record.user.toString().indexOf(BOT_USERNAME) > -1) {
@@ -51,35 +53,49 @@ export default class PushController {
     }
   }
 
-  async getDeliverableLogic() {
+  async getCourse() {
     try {
-      let deliverables: Deliverable[] = new Array<Deliverable>();
-      let promises = [];
-      let delivRepo: DeliverableRepo = new DeliverableRepo();
+      let courseRepo: CourseRepo = new CourseRepo();
+      courseRepo.getCourse(this.courseNum)
+        .then((course: Course) => {
+          this.course = course;
+          return course;
+        })
+        .then((course: Course) => {
+          if (this.course) {
+            return this.course;
+          } else {
+            throw `Could not find course ${this.courseNum}.`;
+          }
+        })
+      } catch (err) {
+        Log.error(`PushController::getDeliverableLogic() Failed to retrieve business logic for Course ${this.courseNum}: ${err}`);
+        return null;
+      }
+  }
 
-      let deliverableQuery = delivRepo.getDeliverable(this.record.deliverable, this.courseNum)
+  async getDeliverable() {
+    try {
+      let delivRepo: DeliverableRepo = new DeliverableRepo();
+      delivRepo.getDeliverable(this.record.deliverable, this.courseNum)
         .then((deliverable: Deliverable) => {
           this.deliverable = deliverable;
           return deliverable;
-        });
-      
-      promises.push(deliverableQuery);
-
-      return await Promise.all(promises)
-        .then(() => {
+        })
+        .then((deliv: Deliverable) => {
           if (this.deliverable) {
             return this.deliverable;
+          } else {
+            throw `Could not find deliverable for ${this.courseNum} course logic.`;
           }
-          else {
-            throw `Could not find deliverables for ${this.courseNum} course logic.`;
-          }
-        });
-    }
-    catch (err) {
-      Log.error(`PushController::getDeliverableLogic() Failed to retrieve business logic for Course ${this.courseNum}: ${err}`);
-    }
+        })
+      } catch (err) {
+        Log.error(`PushController::getDeliverableLogic() Failed to retrieve business logic for Course ${this.courseNum}: ${err}`);
+        return null;
+      }
   }
 
+  // ## NOTE: If dockerOverride is true, use Deliverable Docker images instead of Course Docker images.
   private markDeliverable(): Promise<Job>[] {
     let that = this;
     let promises: Promise<Job>[] = [];
@@ -89,8 +105,8 @@ export default class PushController {
         let deliverable = this.deliverable;
         let open: Date = new Date(deliverable.open);
         let close: Date = new Date(deliverable.close);
-        let dockerImage = deliverable.dockerImage;
-        let dockerBuild = deliverable.dockerBuild;
+        let dockerImage = this.deliverable.dockerOverride === true ? this.course.dockerImage : this.deliverable.dockerImage;
+        let dockerBuild = this.deliverable.dockerOverride === true ? this.course.dockerBuild : this.deliverable.dockerBuild;
         let testJob: TestJob;
         if (open <= currentDate && close >= currentDate) {
             testJob = {
@@ -104,6 +120,7 @@ export default class PushController {
               commitUrl: record.commitUrl,
               closeDate: deliverable.close,
               openDate: deliverable.open,
+              course: this.course,
               courseNum: this.courseNum,
               username: record.user,
               timestamp: record.timestamp,
@@ -114,12 +131,12 @@ export default class PushController {
               postbackOnComplete: deliverable.postbackOnComplete || false,
               test: {
                 dockerInput: this.dockerInput,
+                dockerOverride: this.deliverable.dockerOverride,
                 dockerImage: dockerImage,
                 dockerBuild: dockerBuild,
-                stamp: 'autotest/' + this.deliverable.dockerImage + ':' + dockerBuild,
+                stamp: 'autotest/' + dockerImage + ':' + dockerBuild,
                 deliverable: record.deliverable
               }
-            // Log.info('PushController::process() - ' + record.team +'#'+ record.commit.short + ' enqueued to run against ' + repo.name + '.');
           } 
         } else {
           throw 'Commit ' + record.commit.short + ' cannot be graded because it is not available for marking before ' + open +

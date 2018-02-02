@@ -7,7 +7,8 @@ import {JobIdData} from '../controller/github/CommitCommentController';
 import * as Url from 'url';
 import {GithubUsername, Commit} from '../model/GithubUtil';
 import {RedisUtil} from '../model/RedisUtil';
-import { DockerInputJSON } from '../model/docker/DockerInput';
+import {Course} from '../model/business/CourseModel';
+import {DockerInputJSON} from '../model/docker/DockerInput';
 import {Visibility} from '../model/settings/DeliverableRecord';
 import {CommitComment} from '../model/requests/CommitComment';
 import PostbackController from './github/PostbackController';
@@ -16,16 +17,18 @@ import RequestRepo from '../repos/RequestRepo';
 import StdioRecordRepo, {StdioRecord} from '../repos/StdioRecordRepo';
 import RedisManager from './RedisManager';
 import Server from '../../src/rest/Server'
-let redis = require("redis");
 import {Result} from '../model/results/ResultRecord';
 import RedisClient from '../model/RedisClient';
 import ResultRecordRepo from '../repos/ResultRecordRepo';
-import { UpdateWriteOpResult } from 'mongodb';
+import {UpdateWriteOpResult} from 'mongodb';
 
-// types are basic because queue strips out functions
+let redis = require("redis");
+
+// types are basic because Redis queue strips out functions
 export interface TestJobDeliverable {
   dockerInput: DockerInputJSON;
   deliverable: string;
+  dockerOverride: boolean;
   dockerImage: string;
   dockerBuild: string;
   stamp: string;
@@ -48,6 +51,7 @@ export interface TestJob {
   hook: Url.Url;
   timestamp: number;
   ref: string;
+  course: Course;
   test: TestJobDeliverable;
   courseNum: number;
   orgName: string;

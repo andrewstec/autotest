@@ -3,6 +3,7 @@ import tmp = require('tmp-promise');
 import fs = require('fs');
 import {IConfig, AppConfig} from '../../Config';
 import {Commit} from '../GithubUtil';
+import {Course} from '../../model/business/CourseModel';
 import {CouchDatabase,Database, DatabaseRecord, InsertResponse} from '../Database';
 import {Result} from '../results/ResultRecord';
 import {TestJob, TestJobDeliverable} from '../../controller/TestJobController';
@@ -82,6 +83,7 @@ export default class TestRecord {
   private testReport: any;
   private commit: string;
   private openDate: number;
+  private course: Course;
   private closeDate: number;
   private resultRecord: Result;
   private commitUrl: string;
@@ -96,10 +98,12 @@ export default class TestRecord {
   private orgName: string;
   private username: string;
   private dockerInput: DockerInputJSON;
+  private dockerContainer: string;
   private idStamp: string;
 
   constructor(githubToken: string, testJob: TestJob) {
     this.courseNum = testJob.courseNum;
+    this.course = testJob.course;
     this.githubToken = githubToken;
     this.team = testJob.team;
     this.requestor = testJob.requestor,
@@ -118,6 +122,7 @@ export default class TestRecord {
     this._id = this.timestamp + '_' + this.team + ':' + this.deliverable.deliverable + '-';
     this.orgName = testJob.orgName;
     this.username = testJob.username;
+    this.dockerContainer = testJob.test.dockerImage + ':' + testJob.test.dockerBuild;
     this.dockerInput = testJob.test.dockerInput;
   }
 
@@ -153,17 +158,17 @@ export default class TestRecord {
     // this.dockerInput input will be accessible in mounted volume of Docker container as /output/docker_SHA.json
     let tempDir = await tmp.dir({ dir: '/tmp', unsafeCleanup: true });
     await this.writeContainerInput(tempDir, this.dockerInput);    
-    
-    console.log(JSON.stringify(this.dockerInput));
+    Log.info('TestRecord:: generate() ' + JSON.stringify(this.dockerInput));
     let that = this;
     let file: string = './docker/tester/run-test-container.sh';
+    let imageName: string;
+    let imageBuild: string;
     let args: string[] = [
-      this.deliverable.dockerImage + ':' + this.deliverable.dockerBuild,
+      this.dockerContainer,
       tempDir.path,
       process.env.NODE_ENV === 'development' ? '--env IS_CONTAINER_LIVE="0"' : '--env IS_CONTAINER_LIVE="1"'
     ];
     Log.info('TestRecord:: generate() Test Arguments' + JSON.stringify(args));
-
     let options = {
       encoding: 'utf8'
     }

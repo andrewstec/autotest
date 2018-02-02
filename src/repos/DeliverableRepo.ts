@@ -3,12 +3,12 @@
  */
 
 import Log from '../Util';
-import { IConfig, AppConfig } from '../Config';
+import {IConfig, AppConfig} from '../Config';
 import mongodb = require('mongodb');
 import db, {MongoDB} from '../db/MongoDB';
-import { DeliverableRecord } from '../model/settings/DeliverableRecord'
-import { Course } from '../model/settings/CourseRecord';
-import { Deliverable } from '../model/settings/DeliverableRecord';
+import {DeliverableRecord} from '../model/settings/DeliverableRecord'
+import {Course} from '../model/business/CourseModel';
+import {Deliverable} from '../model/settings/DeliverableRecord';
 
 const COURSE_COLLECTION = 'courses';
 const DELIVERABLES_COLLECTION = 'deliverables';

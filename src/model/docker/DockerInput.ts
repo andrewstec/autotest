@@ -39,7 +39,7 @@ export interface DockerGithubKeys {
 }
 
 export interface DockerContainerInfo {
-  branch: string,
+  build: string,
   suiteVersion: string,
   image: string,
   exitCode: number,
@@ -73,14 +73,13 @@ export interface DockerDeliverableInfo {
 export default class DockerInput {
   private config: IConfig;
   private deliverable: Deliverable;
+  private course: Course;
   private pushRecord: PushRecord;
-  private courseNum: number;
-  private _DockerInputJSON: DockerInputJSON = null;
   
-  constructor(deliverable: Deliverable, pushRecord: PushRecord, courseNum: number) {
+  constructor(deliverable: Deliverable, pushRecord: PushRecord, course: Course) {
     this.deliverable = deliverable;
     this.pushRecord = pushRecord;
-    this.courseNum = courseNum;
+    this.course = course;
     this.config = new AppConfig();
   }
 
@@ -96,22 +95,12 @@ export default class DockerInput {
       });
   }
 
-  private getCourseInfo(): Promise<Course> {
-    let that = this;
-    let courseRepo = new CourseRepo();
-    return courseRepo.getCourse(that.courseNum)
-      .then((course: Course) => {
-        return course;
-      });
-  }
-
   public async createDockerInputJSON() {
     let that = this;
     try {
-
       let userInfo: DockerUserInfo = {username: null, csid: null, snum: null, profileUrl: null, fname: null, lname: null};
       let pushInfo: DockerPushInfo = {branch: null, repo: null, commit: null, commitUrl: null, projectUrl: null, timestamp: null};
-      let container: DockerContainerInfo = {branch: null, suiteVersion: null, image: null, exitCode: null};
+      let container: DockerContainerInfo = {build: null, suiteVersion: null, image: null, exitCode: null};
       let githubKeys: DockerGithubKeys = {solutionsKey: null, delivKey: null, orgKey: null};
       let dockerImage: '';
       let deliverableInfo: DockerDeliverableInfo = {solutionsUrl: null, deliverableCommit: null, deliverableUrl: null, deliverableToMark: null};
@@ -147,12 +136,9 @@ export default class DockerInput {
           }
         })
         .then(() => {
-          return that.getCourseInfo()
-            .then((course: Course) => {
-              dockerInput.githubKeys.delivKey = course.delivKey;
-              dockerInput.githubKeys.solutionsKey = course.solutionsKey;
-              dockerInput.githubKeys.orgKey = this.config.getGithubToken();
-            });
+          dockerInput.githubKeys.delivKey = this.course.delivKey;
+          dockerInput.githubKeys.solutionsKey = this.course.solutionsKey;
+          dockerInput.githubKeys.orgKey = this.config.getGithubToken();
         })
         .then(() => {
           dockerInput.deliverableInfo.deliverableCommit = this.deliverable.commit;
@@ -165,20 +151,19 @@ export default class DockerInput {
           dockerInput.pushInfo.projectUrl = this.pushRecord.projectUrl;
           dockerInput.pushInfo.repo = this.pushRecord.repo;
           dockerInput.pushInfo.timestamp = this.pushRecord.timestamp;
-          dockerInput.container.image = this.deliverable.dockerImage;
-          dockerInput.container.branch = this.deliverable.dockerBuild;
-          dockerInput.dockerImage = this.deliverable.dockerImage + ':' + this.deliverable.dockerBuild;
+          dockerInput.container.image = this.deliverable.dockerOverride === true ? this.course.dockerImage : this.deliverable.dockerImage;
+          dockerInput.container.build = this.deliverable.dockerOverride === true ? this.course.dockerImage : this.deliverable.dockerImage;
+          dockerInput.dockerImage = dockerInput.container.image + ':' + dockerInput.container.build;
           dockerInput.teamId = this.pushRecord.team;
           dockerInput.whitelistedServers = this.deliverable.whitelistedServers;
           dockerInput.allowDNS = this.deliverable.allowDNS;
           dockerInput.customHtml = this.deliverable.customHtml;
           dockerInput.rate = this.deliverable.rate;
           dockerInput.custom = this.deliverable.custom;
-          dockerInput.courseNum = this.courseNum;          
+          dockerInput.courseNum = parseInt(this.course.courseId);          
           dockerInput.githubOrg = this.pushRecord.githubOrg;
           dockerInput.postbackOnComplete = this.deliverable.postbackOnComplete;
-          that._DockerInputJSON = dockerInput;
-          return this._DockerInputJSON;          
+          return dockerInput;          
         });
     } catch (err) {
       Log.error(`DockerInput::DockerInputJSON() ERROR ${err}`);

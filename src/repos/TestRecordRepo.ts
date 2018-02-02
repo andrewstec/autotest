@@ -3,11 +3,11 @@
  */
 
 import Log from '../Util';
-import { IConfig, AppConfig } from '../Config';
+import {IConfig, AppConfig} from '../Config';
 import mongodb = require('mongodb');
 import db, {Database, InsertOneResponse} from '../db/MongoDB';
-import { Deliverable } from '../model/settings/DeliverableRecord'
-import { Course } from '../model/settings/CourseRecord';
+import {Deliverable} from '../model/settings/DeliverableRecord'
+import {Course} from '../model/business/CourseModel';
 import TestRecord from '../model/results/TestRecord';
 import {TestJobDeliverable} from '../controller/TestJobController';
 

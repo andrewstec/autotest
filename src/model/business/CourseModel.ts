@@ -1,27 +1,31 @@
+import * as Url from 'url';
 
-// Requires a 'settings' property in the Course model on the 
-// Classportal-backend MongoDB schema
+import {Commit} from '../GithubUtil';
+import {Deliverable} from '../settings/DeliverableRecord'
 
-export class Course {
+export interface CourseSettings {
+  bootstrapImage: string;
+  testingDelay: boolean;
+  delayTime: number;
+  markDelivsByBatch: boolean;
+  deliverables: { [id: string]: Deliverable };
+}
+
+export interface Course {
+  _id: string;
   courseId: string;
-  minTeamSize: number;
-  maxTeamSize: number;
-  modules: string[];
-  customData: any;
   solutionsKey: string;
   delivKey: string;
   classList: Object[];
   staffList: [string];
-  batchDeliverables: Object[];
-  deliverables: Object[];
+  dockerImage: string;
+  dockerBuild: string;
+  containerBuilt: boolean;
   labSections: Object[];
   urlWebhook: string;
   githubOrgs: Object[];
   grades: Object[];
-  batchSourceUrl: string;
-  studentsSetTeams: boolean;
-  teamsEnabled: boolean;
   description: string;
   admins: [string];
-  teamMustBeInSameLab: Boolean;
+  custom: object;
 }

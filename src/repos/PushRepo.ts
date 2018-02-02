@@ -3,13 +3,13 @@
  */
 
 import Log from '../Util';
-import { IConfig, AppConfig } from '../Config';
+import {IConfig, AppConfig} from '../Config';
 import mongodb = require('mongodb');
 import db, {Database, InsertOneResponse} from '../db/MongoDB';
 import PushRecord, {Push} from '../model/requests/PushRecord';
 import CommitCommentRecord, {CommitComment} from '../model/requests/CommitComment';
-import { Deliverable } from '../model/settings/DeliverableRecord';
-import { Course } from '../model/settings/CourseRecord';
+import {Deliverable} from '../model/settings/DeliverableRecord';
+import {Course} from '../model/business/CourseModel';
 
 const REQUESTS_COLLECTION = 'requests';
 const OBJECT_ID_PROPERTY = '_id';
