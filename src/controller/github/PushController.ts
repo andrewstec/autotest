@@ -56,7 +56,7 @@ export default class PushController {
   async getCourse() {
     try {
       let courseRepo: CourseRepo = new CourseRepo();
-      courseRepo.getCourse(this.courseNum)
+      return courseRepo.getCourse(this.courseNum)
         .then((course: Course) => {
           this.course = course;
           return course;
@@ -77,7 +77,7 @@ export default class PushController {
   async getDeliverable() {
     try {
       let delivRepo: DeliverableRepo = new DeliverableRepo();
-      delivRepo.getDeliverable(this.record.deliverable, this.courseNum)
+      return delivRepo.getDeliverable(this.record.deliverable, this.courseNum)
         .then((deliverable: Deliverable) => {
           this.deliverable = deliverable;
           return deliverable;
@@ -105,8 +105,8 @@ export default class PushController {
         let deliverable = this.deliverable;
         let open: Date = new Date(deliverable.open);
         let close: Date = new Date(deliverable.close);
-        let dockerImage = this.deliverable.dockerOverride === true ? this.course.dockerImage : this.deliverable.dockerImage;
-        let dockerBuild = this.deliverable.dockerOverride === true ? this.course.dockerBuild : this.deliverable.dockerBuild;
+        let dockerImage = this.deliverable.dockerOverride === false ? this.course.dockerImage : this.deliverable.dockerImage;
+        let dockerBuild = this.deliverable.dockerOverride === false ? this.course.dockerBuild : this.deliverable.dockerBuild;
         let testJob: TestJob;
         if (open <= currentDate && close >= currentDate) {
             testJob = {
@@ -130,8 +130,8 @@ export default class PushController {
               ref: record.ref,
               postbackOnComplete: deliverable.postbackOnComplete || false,
               test: {
-                dockerInput: this.dockerInput,
-                dockerOverride: this.deliverable.dockerOverride,
+                dockerInput: that.dockerInput,
+                dockerOverride: that.deliverable.dockerOverride,
                 dockerImage: dockerImage,
                 dockerBuild: dockerBuild,
                 stamp: 'autotest/' + dockerImage + ':' + dockerBuild,

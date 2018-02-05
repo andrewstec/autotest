@@ -32,6 +32,8 @@ export interface Deliverable {
   containerBuilt: boolean;
   allowDNS: number;
   whitelistedServers: string;
+  deliverableKey: string;
+  solutionsKey: string;
   custom: object;
   rate: number;
 }

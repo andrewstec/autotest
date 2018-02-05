@@ -161,8 +161,6 @@ export default class TestRecord {
     Log.info('TestRecord:: generate() ' + JSON.stringify(this.dockerInput));
     let that = this;
     let file: string = './docker/tester/run-test-container.sh';
-    let imageName: string;
-    let imageBuild: string;
     let args: string[] = [
       this.dockerContainer,
       tempDir.path,

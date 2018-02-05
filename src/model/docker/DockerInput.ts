@@ -136,8 +136,8 @@ export default class DockerInput {
           }
         })
         .then(() => {
-          dockerInput.githubKeys.delivKey = this.course.delivKey;
-          dockerInput.githubKeys.solutionsKey = this.course.solutionsKey;
+          dockerInput.githubKeys.delivKey = that.deliverable.deliverableKey;
+          dockerInput.githubKeys.solutionsKey = this.deliverable.solutionsKey;
           dockerInput.githubKeys.orgKey = this.config.getGithubToken();
         })
         .then(() => {
