@@ -51,6 +51,7 @@ export default class CommitCommentRecord {
   private deliverableRate: number;
   private isRequest: boolean;
   private isProcessed: boolean;
+  private requestedDeliv: string;
   private options: string[] = [];
   private orgName: string;
   private note: string;
@@ -85,9 +86,9 @@ export default class CommitCommentRecord {
         that.isRequest = (payload.comment.body.toLowerCase().includes(this.config.getMentionTag()) && this.user !== 'autobot');
         that.isProcessed = false;
         if (that.isRequest) {
-          that.options = this.extractOptions(this.message);
-          let reqDeliverable: string = this.options[0];
-          let deliverable: FetchedDeliverable = await that.fetchDeliverable(reqDeliverable, this.courseNum);
+          that.options = that.extractOptions(that.message);
+          that.requestedDeliv = that.options[0];
+          let deliverable: FetchedDeliverable = await that.fetchDeliverable(that.requestedDeliv, that.courseNum);
           that.deliverable = deliverable.key;
           that.deliverableRate = deliverable.deliverable.rate;
         }
