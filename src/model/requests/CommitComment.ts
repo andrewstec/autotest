@@ -198,6 +198,10 @@ export default class CommitCommentRecord {
   public getDeliverable(): string {
     return this.deliverable;
   }
+
+  public getRequestedDeliv(): string {
+    return this.requestedDeliv;
+  }
   
   public getDeliverableRate(): number {
     return this.deliverableRate;

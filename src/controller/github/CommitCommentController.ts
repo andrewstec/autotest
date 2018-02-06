@@ -83,7 +83,7 @@ export default class CommitCommentContoller {
           let requestor: string = record.getRequestor();
           let orgName: string = record.getOrgName();
           let commit: string = record.getCommit().short;
-          let deliverable: string = record.getDeliverable();
+          let deliverable: string = record.getRequestedDeliv();
           let reqId: string = team + '-' + commit + '-' + deliverable;
 
           let req: PendingRequest = {
