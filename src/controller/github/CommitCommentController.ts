@@ -148,7 +148,7 @@ export default class CommitCommentContoller {
                 record.setIsProcessed(false)
                 try {
                   Log.info('CommitCommentController::process() - Checking if commit is queued.')
-                  let maxPos: number = await that.isQueued(deliv, record.getTeam(), record.getCommit())
+                  let maxPos: number = await that.isQueued(deliv, record.getTeam(), record.getCommit(), deliverable)
                   let body: string;
                   try {
                     let jobIdData: JobIdData = { 
@@ -262,10 +262,10 @@ export default class CommitCommentContoller {
    * Checks if the request is in the job queue.
    *
    */
-  private async isQueued(deliverable: Deliverable, team: string, commit: Commit): Promise<number> {
+  private async isQueued(deliverable: Deliverable, team: string, commit: Commit, requestDeliv: string): Promise<number> {
     //  jobId: job.test.image + '|'  + job.team + '#' + job.commit,
     return new Promise<number>((fulfill, reject) => {
-      let jobId: string = deliverable.dockerImage + ':' + deliverable.dockerBuild + '|' + deliverable.name + '-' + team + '#' + commit.short;
+      let jobId: string = deliverable.dockerImage + ':' + deliverable.dockerBuild + '|' + requestDeliv + '-' + team + '#' + commit.short;
       let queue: TestJobController = TestJobController.getInstance(this.courseNum);
 
       queue.getJob(jobId).then(job => {

@@ -279,7 +279,7 @@ export default class TestJobController {
     try {
       let job: Job = await this.stdManager.queue.getJob(id);
       let jobState: string = await job.getState();
-      let searchKey: string = `*${jobIdData.dockerImage}:${jobIdData.dockerBuild}*${jobIdData.team}#${jobIdData.commit}`;
+      let searchKey: string = `*${jobIdData.dockerImage}:${jobIdData.dockerBuild}*${jobIdData.deliverable}*${jobIdData.team}#${jobIdData.commit}`;
       if (jobState !== 'active' && jobState !== 'failed') {
         Log.info('TestJobController::promoteJob() - The job ' + id + ' is' + jobState + '. Moving to the express queue. Updating job.state to REQUESTED.');
         await this.stdManager.queue.remove(job.jobId);
