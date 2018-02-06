@@ -72,30 +72,18 @@ export interface DockerDeliverableInfo {
 
 export default class DockerInput {
   private config: IConfig;
-  private deliverable: Deliverable;
   private course: Course;
+  private user: User;
   private pushRecord: PushRecord;
   
-  constructor(deliverable: Deliverable, pushRecord: PushRecord, course: Course) {
-    this.deliverable = deliverable;
+  constructor(pushRecord: PushRecord, course: Course, user: User) {
     this.pushRecord = pushRecord;
     this.course = course;
+    this.user = user;
     this.config = new AppConfig();
   }
 
-  private getUserInfo(): Promise<User> {
-    let userRepo = new UserRepo();
-    return userRepo.getUser(this.pushRecord.user)
-      .then((user: User) => {
-        if (user) {
-          return user;
-        }
-        Log.warn(`DockerInput::getUserInfo() The user ${this.pushRecord.user} cannot be found in the DB. ` + 
-          'DockerInput will have null user entries.')
-      });
-  }
-
-  public async createDockerInputJSON() {
+  public createDockerInputJSON(deliverable: Deliverable): DockerInputJSON {
     let that = this;
     try {
       let userInfo: DockerUserInfo = {username: null, csid: null, snum: null, profileUrl: null, fname: null, lname: null};
@@ -123,48 +111,38 @@ export default class DockerInput {
         // stdioRef matches container input so that we can always join objects easily and uniquely
         stdioRef:  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
       };
-
-      return this.getUserInfo()
-        .then((user: User) => {
-          if (user) {
-            dockerInput.userInfo.csid = user.csid;
-            dockerInput.userInfo.snum = user.snum;
-            dockerInput.userInfo.fname = user.fname;
-            dockerInput.userInfo.lname = user.lname;
-            dockerInput.userInfo.username = user.username;
-            dockerInput.userInfo.profileUrl = user.profileUrl;
-          }
-        })
-        .then(() => {
-          dockerInput.githubKeys.delivKey = that.deliverable.deliverableKey;
-          dockerInput.githubKeys.solutionsKey = this.deliverable.solutionsKey;
-          dockerInput.githubKeys.orgKey = this.config.getGithubToken();
-        })
-        .then(() => {
-          dockerInput.deliverableInfo.deliverableCommit = this.deliverable.commit;
-          dockerInput.deliverableInfo.deliverableUrl = this.deliverable.url;
-          dockerInput.deliverableInfo.deliverableToMark = this.pushRecord.deliverable;
-          dockerInput.deliverableInfo.solutionsUrl = this.deliverable.solutionsUrl;
-          dockerInput.pushInfo.branch = this.pushRecord.ref;
-          dockerInput.pushInfo.commit = this.pushRecord.commit.short;
-          dockerInput.pushInfo.commitUrl = this.pushRecord.commitUrl;
-          dockerInput.pushInfo.projectUrl = this.pushRecord.projectUrl;
-          dockerInput.pushInfo.repo = this.pushRecord.repo;
-          dockerInput.pushInfo.timestamp = this.pushRecord.timestamp;
-          dockerInput.container.image = this.deliverable.dockerOverride === true ? this.course.dockerImage : this.deliverable.dockerImage;
-          dockerInput.container.build = this.deliverable.dockerOverride === true ? this.course.dockerImage : this.deliverable.dockerImage;
-          dockerInput.dockerImage = dockerInput.container.image + ':' + dockerInput.container.build;
-          dockerInput.teamId = this.pushRecord.team;
-          dockerInput.whitelistedServers = this.deliverable.whitelistedServers;
-          dockerInput.allowDNS = this.deliverable.allowDNS;
-          dockerInput.customHtml = this.deliverable.customHtml;
-          dockerInput.rate = this.deliverable.rate;
-          dockerInput.custom = this.deliverable.custom;
-          dockerInput.courseNum = parseInt(this.course.courseId);          
-          dockerInput.githubOrg = this.pushRecord.githubOrg;
-          dockerInput.postbackOnComplete = this.deliverable.postbackOnComplete;
-          return dockerInput;          
-        });
+        dockerInput.userInfo.csid = this.user.csid;
+        dockerInput.userInfo.snum = this.user.snum;
+        dockerInput.userInfo.fname = this.user.fname;
+        dockerInput.userInfo.lname = this.user.lname;
+        dockerInput.userInfo.username = this.user.username;
+        dockerInput.userInfo.profileUrl = this.user.profileUrl;
+        dockerInput.githubKeys.delivKey = deliverable.deliverableKey;
+        dockerInput.githubKeys.solutionsKey = deliverable.solutionsKey;
+        dockerInput.githubKeys.orgKey = this.config.getGithubToken();
+        dockerInput.deliverableInfo.deliverableCommit = deliverable.commit;
+        dockerInput.deliverableInfo.deliverableUrl = deliverable.url;
+        dockerInput.deliverableInfo.deliverableToMark = deliverable.name;
+        dockerInput.deliverableInfo.solutionsUrl = deliverable.solutionsUrl;
+        dockerInput.pushInfo.branch = this.pushRecord.ref;
+        dockerInput.pushInfo.commit = this.pushRecord.commit.short;
+        dockerInput.pushInfo.commitUrl = this.pushRecord.commitUrl;
+        dockerInput.pushInfo.projectUrl = this.pushRecord.projectUrl;
+        dockerInput.pushInfo.repo = this.pushRecord.repo;
+        dockerInput.pushInfo.timestamp = this.pushRecord.timestamp;
+        dockerInput.container.image = deliverable.dockerOverride === true ? this.course.dockerImage : deliverable.dockerImage;
+        dockerInput.container.build = deliverable.dockerOverride === true ? this.course.dockerImage : deliverable.dockerImage;
+        dockerInput.dockerImage = dockerInput.container.image + ':' + dockerInput.container.build;
+        dockerInput.teamId = this.pushRecord.team;
+        dockerInput.whitelistedServers = deliverable.whitelistedServers;
+        dockerInput.allowDNS = deliverable.allowDNS;
+        dockerInput.customHtml = deliverable.customHtml;
+        dockerInput.rate = deliverable.rate;
+        dockerInput.custom = deliverable.custom;
+        dockerInput.courseNum = parseInt(this.course.courseId);          
+        dockerInput.githubOrg = this.pushRecord.githubOrg;
+        dockerInput.postbackOnComplete = deliverable.postbackOnComplete;
+        return dockerInput;
     } catch (err) {
       Log.error(`DockerInput::DockerInputJSON() ERROR ${err}`);
     }

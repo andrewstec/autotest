@@ -3,6 +3,8 @@ import {IConfig, AppConfig} from '../../Config';
 import PushRecord, {Push} from '../../model/requests/PushRecord';
 import TestJobController from '../TestJobController';
 import {Job} from '../../model/JobQueue';
+import UserRepo from '../../repos/UserRepo';
+import {User} from '../../model/business/UserModel';
 import {DeliverableRecord} from '../../model/settings/DeliverableRecord';
 import {Course} from '../../model/business/CourseModel';
 import {Deliverable} from '../../model/settings/DeliverableRecord';
@@ -22,6 +24,7 @@ export default class PushController {
   private deliverables: Deliverable[];
   private courseNum: number;
   private course: Course;
+  private user: User;
   private record: PushRecord;
   private dockerHelper: DockerHelper;
   private dockerInput: DockerInputJSON;
@@ -38,21 +41,20 @@ export default class PushController {
 
     this.deliverable = await this.getDeliverable();
     this.course = await this.getCourse();
+    this.user = await this.getUserInfo();
     this.deliverables = await new DeliverableRepo().getDeliverables(this.courseNum);
-    this.dockerHelper = await new DockerHelper(this.deliverable, this.record, this.course);
-    this.dockerInput = await this.dockerHelper.createDockerInputJSON();
+    this.dockerHelper = await new DockerHelper(this.record, this.course, this.user);
+    this.dockerInput = await this.dockerHelper.createDockerInputJSON(this.deliverable);
 
     let testsToMark = [];
-    // always mark this incoming deliverable
-    let incomingDelivTest = this.markDeliverable(this.deliverable);
-    testsToMark.push(incomingDelivTest);
 
     // mark additional regressionTests if they exist on Deliverable
     if (this.deliverable.regressionTest) {
       let that = this;
       this.deliverables.map((deliv) => {
         if (this.deliverable.regressionTests.indexOf(deliv.name) > -1) {
-          that.markDeliverable(deliv);
+          let dockerInput: DockerInputJSON = this.dockerHelper.createDockerInputJSON(deliv);
+          that.markDeliverable(deliv, dockerInput);
         }
       });
     }
@@ -66,7 +68,8 @@ export default class PushController {
       }
     }
     else {
-      return Promise.all(this.markDeliverable(this.deliverable));
+      // Always mark and return the incoming deliverable.
+      return Promise.all(this.markDeliverable(this.deliverable, this.dockerInput));
     }
   }
 
@@ -91,6 +94,18 @@ export default class PushController {
       }
   }
 
+  private getUserInfo(): Promise<User> {
+    let userRepo = new UserRepo();
+    return userRepo.getUser(this.record.user)
+      .then((user: User) => {
+        if (user) {
+          return user;
+        }
+        Log.warn(`DockerInput::getUserInfo() The user ${this.record.user} cannot be found in the DB. ` + 
+          'DockerInput will have null user entries.')
+      });
+  }
+
   async getDeliverable() {
     try {
       let delivRepo: DeliverableRepo = new DeliverableRepo();
@@ -113,7 +128,7 @@ export default class PushController {
   }
 
   // ## NOTE: If dockerOverride is true, use Deliverable Docker images instead of Course Docker images.
-  private markDeliverable(deliverable: Deliverable): Promise<Job>[] {
+  private markDeliverable(deliverable: Deliverable, dockerInput: DockerInputJSON): Promise<Job>[] {
     let that = this;
     let promises: Promise<Job>[] = [];
     let currentDate: Date = new Date();
@@ -146,7 +161,7 @@ export default class PushController {
               ref: record.ref,
               postbackOnComplete: deliverable.postbackOnComplete || false,
               test: {
-                dockerInput: that.dockerInput,
+                dockerInput: dockerInput,
                 dockerOverride: deliverable.dockerOverride,
                 dockerImage: dockerImage,
                 dockerBuild: dockerBuild,
