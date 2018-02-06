@@ -153,7 +153,7 @@ export default class TestJobController {
         await redis.client.disconnect();
       }
       
-      // Fixj this error when a result record does not exist. It should throw an error but needs a major error message
+      // Fix this error when a result record does not exist. It should throw an error but needs a major error message
       let resultRecordRepo = new ResultRecordRepo();
       let resultRecord = await resultRecordRepo.getLatestResultRecord(jobData.team, jobData.commit, jobData.deliverable, jobData.orgName);
 
@@ -257,7 +257,7 @@ export default class TestJobController {
    */
   public async addJob(job: TestJob): Promise<Job> {
     let opts: JobOpts = {
-      jobId: job.test.dockerImage + ':' + job.test.dockerBuild + '|' + job.test.deliverable + '-'  + job.team + '#' + job.commit,
+      jobId: job.test.dockerImage + ':' + job.test.dockerBuild + '|' + job.deliverable + '-'  + job.team + '#' + job.commit,
       removeOnComplete: true
     }
     return <Promise<Job>>this.stdManager.queue.add(job, opts);

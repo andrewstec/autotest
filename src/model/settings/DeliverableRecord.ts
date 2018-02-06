@@ -29,6 +29,8 @@ export interface Deliverable {
   dockerOverride: boolean;
   dockerImage: string;
   dockerBuild: string;
+  regressionTest: boolean;
+  regressionTests: string;
   containerBuilt: boolean;
   allowDNS: number;
   whitelistedServers: string;

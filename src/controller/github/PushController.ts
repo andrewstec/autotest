@@ -19,6 +19,7 @@ export default class PushController {
   private config: IConfig;
   private runningPort: number;
   private deliverable: Deliverable;
+  private deliverables: Deliverable[];
   private courseNum: number;
   private course: Course;
   private record: PushRecord;
@@ -37,8 +38,24 @@ export default class PushController {
 
     this.deliverable = await this.getDeliverable();
     this.course = await this.getCourse();
+    this.deliverables = await new DeliverableRepo().getDeliverables(this.courseNum);
     this.dockerHelper = await new DockerHelper(this.deliverable, this.record, this.course);
     this.dockerInput = await this.dockerHelper.createDockerInputJSON();
+
+    let testsToMark = [];
+    // always mark this incoming deliverable
+    let incomingDelivTest = this.markDeliverable(this.deliverable);
+    testsToMark.push(incomingDelivTest);
+
+    // mark additional regressionTests if they exist on Deliverable
+    if (this.deliverable.regressionTest) {
+      let that = this;
+      this.deliverables.map((deliv) => {
+        if (this.deliverable.regressionTests.indexOf(deliv.name) > -1) {
+          that.markDeliverable(deliv);
+        }
+      });
+    }
 
     if (this.record.user.toString().indexOf(BOT_USERNAME) > -1) {
       try {
@@ -49,7 +66,7 @@ export default class PushController {
       }
     }
     else {
-      return Promise.all(this.markDeliverable());
+      return Promise.all(this.markDeliverable(this.deliverable));
     }
   }
 
@@ -96,24 +113,23 @@ export default class PushController {
   }
 
   // ## NOTE: If dockerOverride is true, use Deliverable Docker images instead of Course Docker images.
-  private markDeliverable(): Promise<Job>[] {
+  private markDeliverable(deliverable: Deliverable): Promise<Job>[] {
     let that = this;
     let promises: Promise<Job>[] = [];
     let currentDate: Date = new Date();
     let record: PushRecord = this.record;
 
-        let deliverable = this.deliverable;
         let open: Date = new Date(deliverable.open);
         let close: Date = new Date(deliverable.close);
-        let dockerImage = this.deliverable.dockerOverride === false ? this.course.dockerImage : this.deliverable.dockerImage;
-        let dockerBuild = this.deliverable.dockerOverride === false ? this.course.dockerBuild : this.deliverable.dockerBuild;
+        let dockerImage = deliverable.dockerOverride === false ? this.course.dockerImage : deliverable.dockerImage;
+        let dockerBuild = deliverable.dockerOverride === false ? this.course.dockerBuild : deliverable.dockerBuild;
         let testJob: TestJob;
         if (open <= currentDate && close >= currentDate) {
             testJob = {
               orgName: record.githubOrg,
               requestor: '',
               state: INIT_STATE,
-              deliverable: that.deliverable.name,
+              deliverable: deliverable.name,
               pendingRequest: false,
               repo: record.repo,
               projectUrl: record.projectUrl,
@@ -131,7 +147,7 @@ export default class PushController {
               postbackOnComplete: deliverable.postbackOnComplete || false,
               test: {
                 dockerInput: that.dockerInput,
-                dockerOverride: that.deliverable.dockerOverride,
+                dockerOverride: deliverable.dockerOverride,
                 dockerImage: dockerImage,
                 dockerBuild: dockerBuild,
                 stamp: 'autotest/' + dockerImage + ':' + dockerBuild,
@@ -144,14 +160,6 @@ export default class PushController {
         }
     promises.push(this.enqueue(testJob));          
     return promises;
-  }
-
-  private checkOverrideBatchMarking(deliverable: string): boolean {
-    // aka. if does not exist because not in REGEX of repo name
-    if (typeof deliverable === 'undefined') {
-      return false;
-    }
-    return true;
   }
 
   private async store(record: PushRecord): Promise<any> {
