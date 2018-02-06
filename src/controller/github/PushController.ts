@@ -166,7 +166,7 @@ export default class PushController {
                 dockerImage: dockerImage,
                 dockerBuild: dockerBuild,
                 stamp: 'autotest/' + dockerImage + ':' + dockerBuild,
-                deliverable: record.deliverable
+                deliverable: deliverable.name
               }
           } 
         } else {
