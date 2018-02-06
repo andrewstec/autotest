@@ -15,8 +15,8 @@
     "build": "tsc",
     "test": "mocha --recursive",
     "deploy": "env $(cat autotest.env | xargs) ./deploy.sh",
-    "start": " node src/App.js",
-    "startf": "forever start --minUptime 1000 --spinSleepTime 1000 -l LOGFILE -o OUTPUT -e ERRFILE --append src/App.js  "
+    "start:dev": " node src/App.js",
+    "start:prod": "forever start --minUptime 1000 --spinSleepTime 1000 -l LOGFILE -o OUTPUT -e ERRFILE --append src/App.js  "
   },
   "devDependencies": {
     "@types/bull": "^1.0.31",
