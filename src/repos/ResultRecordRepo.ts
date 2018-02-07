@@ -53,7 +53,7 @@ export default class ResultRecordRepo {
    * @param _requestor The username of the person who made the grade request.
    * @return <InsertOneResponse> that includes number of successful DB entries
    */
-  public addGradeRequestedInfo(_commitUrl: string, delivName: string, _requestor: string): Promise<mongodb.UpdateWriteOpResult> {
+  public addGradeRequestedInfo(_commitUrl: string, _deliverable: string, _requestor: string): Promise<mongodb.UpdateWriteOpResult> {
     let context: mongodb.Db; 
     try {
       return new Promise<mongodb.UpdateWriteOpResult>((fulfill, reject) => {
@@ -67,7 +67,7 @@ export default class ResultRecordRepo {
           })
           .then(() => {
             return new Promise<ResultRecord[]>((fulfill, reject) => {
-              context.collection(RESULTS_COLLECTION).find({commitUrl: _commitUrl})
+              context.collection(RESULTS_COLLECTION).find({commitUrl: _commitUrl, deliverable: _deliverable})
                 .toArray((err: Error, results: ResultRecord[]) => {
                   if (results.length > 0) {
                   fulfill(results);
