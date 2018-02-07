@@ -176,7 +176,7 @@ export default class TestJobController {
             Log.error('TestJobController:: Could not insert isProcessed = true CommitComment Requests record ' + err);
           });
 
-        resultRecordRepo.addGradeRequestedInfo(jobData.commitUrl, pendingRequest.requestor)
+        resultRecordRepo.addGradeRequestedInfo(jobData.commitUrl, jobData.deliverable, pendingRequest.requestor)
           .catch((err) => {
             Log.error(`TestJobController:: completed() ERROR updating gradeRequested details on ${jobData.commitUrl} for ${jobData.requestor}`);
           });

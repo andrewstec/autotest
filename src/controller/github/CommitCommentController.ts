@@ -324,7 +324,7 @@ export default class CommitCommentContoller {
     let resultRecordRepo: ResultRecordRepo = new ResultRecordRepo();    
     
     if (_record.getIsProcessed() && _record.getIsRequest()) {
-      return resultRecordRepo.addGradeRequestedInfo(commitUrl, requestor)
+      return resultRecordRepo.addGradeRequestedInfo(commitUrl, _record.getRequestedDeliv(), requestor)
       .then((fulfilledResponse) => {
         // If results found, update ResultRecords with true/false isProcessed and isRequest statuses
         Log.info(`CommitCommentController::addGradeRequestedStatus Succesfully updated ${fulfilledResponse.result.nModified} record.`)
