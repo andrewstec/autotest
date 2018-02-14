@@ -59,6 +59,7 @@ export interface ProcessedTag {
 export interface TestInfo {
   testRecord: Result,
   containerExitCode: number,
+  stdioLog: Attachment,
   processErrors: string[]
 }
 
@@ -224,6 +225,7 @@ export default class TestRecord {
         Promise.all(promises).then((err) => {
           let testInfo: TestInfo = {
             testRecord: that.getTestRecord(),
+            stdioLog: that.getStdio(),
             containerExitCode: this.containerExitCode,
             processErrors: err
           }
@@ -254,6 +256,18 @@ export default class TestRecord {
     }
   }
 
+  public getStdio() {
+    if (this.stdio && this.stdio.length > this.maxStdioLength) {
+      let trimmedStdio = String(this.stdio).substring(0, this.maxStdioLength);
+      trimmedStdio += "\n\n\n STDIO FILE TRUNCATED AS OVER " + this.maxStdioLength + " CHARACTER SIZE LIMIT";
+      let attachment = {name: 'stdio.txt', data: trimmedStdio, content_type: 'application/plain'};
+      return attachment;
+    } else {
+      let attachment = {name: 'stdio.txt', data: this.stdio, content_type: 'application/plain'};
+      return attachment;
+    }
+  }
+
   public writeContainerInput(tmpDir: any, dockerInput: object) {
     new Promise((fulfill, reject) => {
       try {
@@ -281,18 +295,6 @@ public getTestRecord(): Result {
       suiteVersion: this.suiteVersion,
       image: this.deliverable.dockerImage,
       exitCode: this.containerExitCode
-    }
-
-    function getStdio() {
-      if (that.stdio && that.stdio.length > that.maxStdioLength) {
-        let trimmedStdio = String(that.stdio).substring(0, that.maxStdioLength);
-        trimmedStdio += "\n\n\n STDIO FILE TRUNCATED AS OVER " + that.maxStdioLength + " CHARACTER SIZE LIMIT";
-        let attachment = {name: 'stdio.txt', data: trimmedStdio, content_type: 'application/plain'};
-        return attachment;
-      } else {
-        let attachment = {name: 'stdio.txt', data: that.stdio, content_type: 'application/plain'};
-        return attachment;
-      }
     }
 
     function getDockerInput() {
@@ -331,7 +333,7 @@ public getTestRecord(): Result {
         'ref': this.ref,
         'idStamp': new Date().toUTCString() + '|' + this.ref + '|' + this.deliverable.deliverable + '|' + this.username + '|' + this.repo,
         'stdioRef': that.dockerInput.stdioRef,
-        'attachments': [getStdio(), getDockerInput()],
+        'attachments': [getDockerInput()],
       }
       Log.info(`TestRecord::getTestRecord() INFO - Created TestRecord to save in case of Timeout on commit ${this.commit} and user ${this.username}`);
       // instead of returning, it should be entered into the Database.

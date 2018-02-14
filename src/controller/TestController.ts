@@ -37,17 +37,19 @@ export default class TestController {
     let stdioRecord: StdioRecord = {stdio: null, idStamp: null};
 
     try {
-      stdioRecord = {stdio: testInfo.testRecord.attachments[0], idStamp: testInfo.testRecord.stdioRef};
+      stdioRecord = {stdio: testInfo.stdioLog, idStamp: testInfo.testRecord.stdioRef};
     } catch(err) {
       Log.error('TestController:: Unable to create stdioRecord ERROR ' + err);
     }
 
     if (testInfo.containerExitCode === 124 || testInfo.containerExitCode === 143) {
+      stdioRecord.stdio.data = stdioRecord.stdio.data + '\n\nCONTAINER TIMED OUT ON AUTOTEST END. EXIT CODE ' + testInfo.containerExitCode;
       stdioRepo.insertStdioRecord(stdioRecord);
       Log.info('TestController::exec() INFO Test ' + testInfo.testRecord.commit +
        ' exit code 124 TIMEOUT; ResultRecord saved by AutoTest.');
        resultRecordRepo.insertResultRecord(testInfo.testRecord);
     } else if (testInfo.containerExitCode === 125) {
+      stdioRecord.stdio.data = stdioRecord.stdio.data + '\n\nCONTAINER FATAL COMMAND LINE ERROR. EXIT CODE ' + testInfo.containerExitCode;
       stdioRepo.insertStdioRecord(stdioRecord);
       Log.error('TestController::exec() ERROR Test ' + testInfo.testRecord.commit +
        ' exit code 125 RUN COMMAND FAILED; ResultRecord saved by AutoTest');
