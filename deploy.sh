@@ -16,7 +16,7 @@ do
   #Creating Redis Queue for Each Course
   #... Mapping Port with Course Num...#
   course=$(($course+7000))
-  Deploying Redis on Port: $course;
+  echo "Deploying Redis on Port: $course"
   docker create \
     --name "autotest-redis-$course" \
     --publish $course:6379 \
