@@ -18,9 +18,9 @@ do
   course=$(($course+7000))
   echo "Deploying Redis on Port: $course"
   docker create \
-    --name "autotest-redis-$course" \
-    --publish $course:6379 \
-  redis
+        --name "autotest-redis-$course" \
+        --publish $course:6379 \
+        redis
   
   #Start Redis Instance on Port
   docker start "autotest-redis-$course"
