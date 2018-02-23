@@ -20,6 +20,7 @@ do
   docker create \
         --name "autotest-redis-$course" \
         --publish $course:6379 \
+        --restart unless-stopped \
         redis
   
   #Start Redis Instance on Port
