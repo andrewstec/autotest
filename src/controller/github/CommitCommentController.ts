@@ -34,7 +34,6 @@ export interface PendingRequest {
 
 export interface JobIdData {
   dockerImage: string;
-  dockerBuild: string;
   deliverable: string;
   team: string;
   commit: string;
@@ -153,12 +152,11 @@ export default class CommitCommentContoller {
                   try {
                     let jobIdData: JobIdData = { 
                         dockerImage: deliv.dockerImage,
-                        dockerBuild: deliv.dockerBuild,
                         deliverable: req.deliverable,
                         team: req.team,
                         commit: req.commit,
                       };
-                    let jobId: string = deliv.dockerImage + ':' + deliv.dockerBuild + '|' + req.deliverable + '-' + req.team+ '#' + req.commit;
+                    let jobId: string = deliv.dockerImage + ':master' + '|' + req.deliverable + '-' + req.team+ '#' + req.commit;
                     await redis.client.set(reqId, req);
                     await queue.promoteJob(jobId, jobIdData, redis.client);
 
@@ -265,7 +263,7 @@ export default class CommitCommentContoller {
   private async isQueued(deliverable: Deliverable, team: string, commit: Commit, requestDeliv: string): Promise<number> {
     //  jobId: job.test.image + '|'  + job.team + '#' + job.commit,
     return new Promise<number>((fulfill, reject) => {
-      let jobId: string = deliverable.dockerImage + ':' + deliverable.dockerBuild + '|' + requestDeliv + '-' + team + '#' + commit.short;
+      let jobId: string = deliverable.dockerImage + ':master' + '|' + requestDeliv + '-' + team + '#' + commit.short;
       let queue: TestJobController = TestJobController.getInstance(this.courseNum);
 
       queue.getJob(jobId).then(job => {

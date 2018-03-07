@@ -123,7 +123,7 @@ export default class TestRecord {
     this._id = this.timestamp + '_' + this.team + ':' + this.deliverable.deliverable + '-';
     this.orgName = testJob.orgName;
     this.username = testJob.username;
-    this.dockerContainer = testJob.test.dockerImage + ':' + testJob.test.dockerBuild;
+    this.dockerContainer = testJob.test.dockerImage + ':master';
     this.dockerInput = testJob.test.dockerInput;
   }
 

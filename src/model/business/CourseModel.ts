@@ -19,7 +19,6 @@ export interface Course {
   classList: Object[];
   staffList: [string];
   dockerImage: string;
-  dockerBuild: string;
   containerBuilt: boolean;
   labSections: Object[];
   urlWebhook: string;

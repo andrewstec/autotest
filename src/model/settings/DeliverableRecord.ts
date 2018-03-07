@@ -28,7 +28,6 @@ export interface Deliverable {
   minTeamSize: number;
   dockerOverride: boolean;
   dockerImage: string;
-  dockerBuild: string;
   regressionTest: boolean;
   regressionTests: string;
   containerBuilt: boolean;

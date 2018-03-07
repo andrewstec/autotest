@@ -30,7 +30,6 @@ export interface TestJobDeliverable {
   deliverable: string;
   dockerOverride: boolean;
   dockerImage: string;
-  dockerBuild: string;
   stamp: string;
 }
 
@@ -257,7 +256,7 @@ export default class TestJobController {
    */
   public async addJob(job: TestJob): Promise<Job> {
     let opts: JobOpts = {
-      jobId: job.test.dockerImage + ':' + job.test.dockerBuild + '|' + job.deliverable + '-'  + job.team + '#' + job.commit,
+      jobId: job.test.dockerImage + ':master' + '|' + job.deliverable + '-'  + job.team + '#' + job.commit,
       removeOnComplete: true
     }
     return <Promise<Job>>this.stdManager.queue.add(job, opts);
@@ -279,7 +278,7 @@ export default class TestJobController {
     try {
       let job: Job = await this.stdManager.queue.getJob(id);
       let jobState: string = await job.getState();
-      let searchKey: string = `*${jobIdData.dockerImage}:${jobIdData.dockerBuild}*${jobIdData.deliverable}*${jobIdData.team}#${jobIdData.commit}`;
+      let searchKey: string = `*${jobIdData.dockerImage}:master*${jobIdData.deliverable}*${jobIdData.team}#${jobIdData.commit}`;
       if (jobState !== 'active' && jobState !== 'failed') {
         Log.info('TestJobController::promoteJob() - The job ' + id + ' is' + jobState + '. Moving to the express queue. Updating job.state to REQUESTED.');
         await this.stdManager.queue.remove(job.jobId);

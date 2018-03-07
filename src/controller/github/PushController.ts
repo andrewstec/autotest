@@ -137,7 +137,6 @@ export default class PushController {
         let open: Date = new Date(deliverable.open);
         let close: Date = new Date(deliverable.close);
         let dockerImage = deliverable.dockerOverride === false ? this.course.dockerImage : deliverable.dockerImage;
-        let dockerBuild = deliverable.dockerOverride === false ? this.course.dockerBuild : deliverable.dockerBuild;
         let testJob: TestJob;
         if (open <= currentDate && close >= currentDate) {
             testJob = {
@@ -164,8 +163,7 @@ export default class PushController {
                 dockerInput: dockerInput,
                 dockerOverride: deliverable.dockerOverride,
                 dockerImage: dockerImage,
-                dockerBuild: dockerBuild,
-                stamp: 'autotest/' + dockerImage + ':' + dockerBuild,
+                stamp: 'autotest/' + dockerImage + ':master',
                 deliverable: deliverable.name
               }
           } 
