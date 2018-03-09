@@ -35,10 +35,9 @@ export default class PushController {
   }
 
   async process(data: JSON) {
-
+    let that = this;
     this.record = new PushRecord(data);
     await this.store(this.record);
-
     this.deliverable = await this.getDeliverable();
     this.course = await this.getCourse();
     this.user = await this.getUserInfo();
@@ -48,20 +47,24 @@ export default class PushController {
 
     let testsToMark = [];
 
-    // mark additional regressionTests if they exist on Deliverable
+    // IMPORTANT: REGRESSION TESTS
+    // If a regression test is valid, it will match one of the Deliverable Names,
+    // and therefore, we can attempt to grade the regression Test.
     if (this.deliverable.regressionTest) {
-      let that = this;
+      let regressionTests = String(this.deliverable.regressionTests).match(/[^ ]+/g);
       this.deliverables.map((deliv) => {
-        if (this.deliverable.regressionTests.indexOf(deliv.name) > -1) {
-          let dockerInput: DockerInputJSON = this.dockerHelper.createDockerInputJSON(deliv);
-          that.markDeliverable(deliv, dockerInput);
+        for (let i = 0; i < regressionTests.length; i++) {
+          if (regressionTests[i] === deliv.name) {
+            let dockerInput: DockerInputJSON = this.dockerHelper.createDockerInputJSON(deliv);
+            that.markDeliverable(deliv, dockerInput);
+          }
         }
       });
     }
 
-    if (this.record.user.toString().indexOf(BOT_USERNAME) > -1) {
+    if (this.record.user === BOT_USERNAME) {
       try {
-        throw `PushController::process() Recieved ${BOT_USERNAME} push from batch cloning repo. Ignoring.`;
+        throw `PushController::process() Recieved ${BOT_USERNAME} push from batch cloning repo. Ignoring 'Push'.`;
       }
       catch (err) {
         Log.info(err);
@@ -127,7 +130,20 @@ export default class PushController {
       }
   }
 
-  // ## NOTE: If dockerOverride is true, use Deliverable Docker images instead of Course Docker images.
+  /**
+   * ENGRAINED FEATURE: DOCKER OVERRIDE 
+   * Docker Override allows a professor to ignore the Course container for grade requests. Instead,
+   * the professor may build a Deliverable-specific container that is used to grade this Deliverable.
+   * 
+   * NOTE: REGRESSION TESTS
+   * Regression tests will also be marked on the basis of the override mode.
+   * 
+   * NOTE: A Test Job is produced that compiles the necessary information to keep track of TestJobs
+   * that are queued by the CommitCommentController, grades that are requested by the CommitCommentController,
+   * running TestJobs in the TestRecord class, and storing grades in ResultRecords that are produced by the 
+   * TestRecord/ResultRecord classes.
+   */
+
   private markDeliverable(deliverable: Deliverable, dockerInput: DockerInputJSON): Promise<Job>[] {
     let that = this;
     let promises: Promise<Job>[] = [];
