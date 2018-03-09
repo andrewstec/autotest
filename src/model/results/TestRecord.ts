@@ -83,9 +83,7 @@ export default class TestRecord {
   private courseNum: number;
   private testReport: any;
   private commit: string;
-  private openDate: number;
   private course: Course;
-  private closeDate: number;
   private resultRecord: Result;
   private commitUrl: string;
   private projectUrl: string;
@@ -116,8 +114,6 @@ export default class TestRecord {
     this.commit = testJob.commit;
     this.committer = testJob.username;
     this.ref = testJob.ref;
-    this.openDate = testJob.openDate,
-    this.closeDate = testJob.closeDate,
     this.timestamp = testJob.timestamp;
     this._id = this.timestamp + '_' + this.team + ':' + this.deliverable.deliverable + '-';
     this.orgName = testJob.orgName;
@@ -314,8 +310,6 @@ public getTestRecord(): Result {
         'commitUrl': this.commitUrl,
         'courseNum': this.courseNum,
         'orgName': this.orgName,
-        'openDate': this.openDate,
-        'closeDate': this.closeDate,
         'deliverable': this.deliverable.deliverable,
         'user': this.username,
         'report': null,

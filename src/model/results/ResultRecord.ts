@@ -18,10 +18,8 @@ export interface Result {
   courseNum: number;
   orgName: string;
   deliverable: string;
-  openDate: number;
   commit: string;
   state: string;
-  closeDate: number;
   requestor: string;
   gradeRequested: boolean;
   gradeRequestedTimestamp: number;
@@ -78,7 +76,6 @@ export default class ResultRecord {
   private orgName: string;
   private deliverable: string;
   private openDate: number;
-  private closeDate: number;
   private user: string;
   private committer: string;
   private timestamp: number;
@@ -103,8 +100,6 @@ export default class ResultRecord {
     this.orgName = result.orgName;
     this.commit = result.commit;
     this.deliverable = result.deliverable;
-    this.openDate = result.openDate;
-    this.closeDate = result.closeDate;
     this.user = result.user;
     this.committer = result.committer;
     this.timestamp = result.timestamp;
@@ -127,11 +122,9 @@ export default class ResultRecord {
       commitUrl: this.commitUrl,
       orgName: this.orgName,
       deliverable: this.deliverable,
-      openDate: this.openDate,
       commit: this.commit,
       gradeRequested: this.gradeRequested,
       gradeRequestedTimestamp: this.gradeRequestedTimestamp,
-      closeDate: this.closeDate,
       user: this.user,
       committer: this.committer,
       courseNum: this.courseNum,
