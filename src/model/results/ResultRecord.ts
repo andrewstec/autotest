@@ -32,7 +32,6 @@ export interface Result {
   report: ReportJSON;  // CommitReport; Need proper JSON schema for this.
   container: ContainerInfo;
   attachments: Attachment[];
-  idStamp: string;
   stdioRef: string;
 }
 
@@ -87,7 +86,6 @@ export default class ResultRecord {
   private report: ReportJSON;  // CommitReport; Need proper JSON schema for this.
   private container: ContainerInfo;
   private attachments: Attachment[];
-  private idStamp: string;
   private stdioRef: string;
 
   constructor(result: Result) {
@@ -114,7 +112,6 @@ export default class ResultRecord {
     this.report = result.report;
     this.container = result.container;
     this.attachments = result.attachments;
-    this.idStamp = result.idStamp;
     this.stdioRef = result.stdioRef;
   }
 
@@ -143,7 +140,6 @@ export default class ResultRecord {
       container: this.container,
       attachments: this.attachments, 
       timestamp: this.timestamp,     
-      idStamp: this.idStamp, 
       stdioRef: this.stdioRef
     }
 

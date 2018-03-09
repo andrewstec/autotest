@@ -9,7 +9,6 @@ export interface Push {
   timestamp: number;
   orgName: string;
   attachments: object;
-  idStamp: string;
 }
 
 export default class PushRecord {
@@ -105,7 +104,6 @@ export default class PushRecord {
       type: 'push',
       timestamp: this.timestamp,
       attachments: attachments,
-      idStamp: docName
     }
 
     return doc;

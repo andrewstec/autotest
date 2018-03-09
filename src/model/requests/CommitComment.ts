@@ -29,7 +29,6 @@ export interface CommitComment {
   type: string;
   timestamp: number;
   attachments: object;
-  idStamp: string;
 }
 
 export default class CommitCommentRecord {
@@ -246,7 +245,6 @@ export default class CommitCommentRecord {
       type: 'commit_comment', 
       timestamp: this.timestamp, 
       attachments: [{name: 'comment.json', data: comment, content_type: 'application/json'}],
-      idStamp: docName
     }
 
     return doc;

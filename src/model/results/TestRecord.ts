@@ -100,7 +100,6 @@ export default class TestRecord {
   private username: string;
   private dockerInput: DockerInputJSON;
   private dockerContainer: string;
-  private idStamp: string;
 
   constructor(githubToken: string, testJob: TestJob) {
     this.courseNum = testJob.courseNum;
@@ -244,7 +243,6 @@ export default class TestRecord {
   public processInfoTag(stdout: string): any {
     try {
       let infoTagRegex: RegExp = /^<INFO>\nproject url: (.+)\nbranch: (.+)\ncommit: (.+)\nscript version: (.+)\ntest suite version: (.+)\n<\/INFO exitCode=(\d+), completed=(.+), duration=(\d+)s>$/gm
-      //let infoMsgRegex: RegExp = /^(npm.*)$/gm;
       let matches: string[] = infoTagRegex.exec(stdout);
       let processed: any = {
         scriptVersion: matches[4].trim(),
@@ -331,7 +329,6 @@ public getTestRecord(): Result {
         'githubFeedback': GITHUB_TIMEOUT_MSG,
         'gradeRequestedTimestamp': -1,
         'ref': this.ref,
-        'idStamp': new Date().toUTCString() + '|' + this.ref + '|' + this.deliverable.deliverable + '|' + this.username + '|' + this.repo,
         'stdioRef': that.dockerInput.stdioRef,
         'attachments': [getDockerInput()],
       }

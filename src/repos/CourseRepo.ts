@@ -2,10 +2,6 @@
  * Created by steca
  * 
  * ******
- * Warning: Two types of 'Course' and 'CourseSettings' objects exist in .../business/CourseModel
- * and .../settings/CourseRecord. This Repo uses a newer business/CourseModel object for its 
- * 'CourseSettings' integration with the front-end of ClassPortal.
- * ******
  */
 
 import Log from '../Util';
