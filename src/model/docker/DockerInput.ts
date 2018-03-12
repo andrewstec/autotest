@@ -39,8 +39,6 @@ export interface DockerGithubKeys {
 }
 
 export interface DockerContainerInfo {
-  build: string,
-  suiteVersion: string,
   image: string,
   exitCode: number,
 }
@@ -88,7 +86,7 @@ export default class DockerInput {
     try {
       let userInfo: DockerUserInfo = {username: null, csid: null, snum: null, profileUrl: null, fname: null, lname: null};
       let pushInfo: DockerPushInfo = {branch: null, repo: null, commit: null, commitUrl: null, projectUrl: null, timestamp: null};
-      let container: DockerContainerInfo = {build: null, suiteVersion: null, image: null, exitCode: null};
+      let container: DockerContainerInfo = {image: null, exitCode: null};
       let githubKeys: DockerGithubKeys = {solutionsKey: null, delivKey: null, orgKey: null};
       let dockerImage: '';
       let deliverableInfo: DockerDeliverableInfo = {solutionsUrl: null, deliverableCommit: null, deliverableUrl: null, deliverableToMark: null};
@@ -130,9 +128,8 @@ export default class DockerInput {
         dockerInput.pushInfo.projectUrl = this.pushRecord.projectUrl;
         dockerInput.pushInfo.repo = this.pushRecord.repo;
         dockerInput.pushInfo.timestamp = this.pushRecord.timestamp;
-        dockerInput.container.image = deliverable.dockerOverride === true ? this.course.dockerImage : deliverable.dockerImage;
-        dockerInput.container.build = deliverable.dockerOverride === true ? this.course.dockerImage : deliverable.dockerImage;
-        dockerInput.dockerImage = dockerInput.container.image + ':' + dockerInput.container.build;
+        dockerInput.container.image = deliverable.dockerOverride === true ? 'autotest/cpsc' + this.course.courseId + '__bootstrap' : 'autotest/cpsc' + this.course.courseId + '__' + deliverable.name + '__bootstrap';
+        dockerInput.dockerImage = dockerInput.container.image;
         dockerInput.teamId = this.pushRecord.team;
         dockerInput.whitelistedServers = deliverable.whitelistedServers;
         dockerInput.allowDNS = deliverable.allowDNS;

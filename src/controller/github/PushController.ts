@@ -132,8 +132,8 @@ export default class PushController {
 
   /**
    * ENGRAINED FEATURE: DOCKER OVERRIDE 
-   * Docker Override allows a professor to ignore the Course container for grade requests. Instead,
-   * the professor may build a Deliverable-specific container that is used to grade this Deliverable.
+   * Docker Override allows a professor to override the Course container for grade requests. Instead,
+   * a Deliverable-specific container will run for this grade.
    * 
    * NOTE: REGRESSION TESTS
    * Regression tests will also be marked on the basis of the override mode.
@@ -152,7 +152,9 @@ export default class PushController {
 
         let open: Date = new Date(deliverable.open);
         let close: Date = new Date(deliverable.close);
-        let dockerImage = deliverable.dockerOverride === false ? this.course.dockerImage : deliverable.dockerImage;
+        let courseImage: string = 'autotest/cpsc' + this.course.courseId + '__bootstrap';
+        let delivImage: string = 'autotest/cpsc' + this.course.courseId + '__' + this.deliverable.name + '__bootstrap';
+        let dockerImage = deliverable.dockerOverride === false ? courseImage : delivImage;
         let testJob: TestJob;
         if (open <= currentDate && close >= currentDate) {
             testJob = {

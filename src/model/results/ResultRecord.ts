@@ -34,8 +34,6 @@ export interface Result {
 }
 
 export interface ContainerInfo {
-  scriptVersion: string;
-  suiteVersion: string;
   image: string;
   exitCode: number;
 }

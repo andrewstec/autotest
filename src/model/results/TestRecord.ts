@@ -97,7 +97,7 @@ export default class TestRecord {
   private orgName: string;
   private username: string;
   private dockerInput: DockerInputJSON;
-  private dockerContainer: string;
+  private dockerImage: string;
 
   constructor(githubToken: string, testJob: TestJob) {
     this.courseNum = testJob.courseNum;
@@ -118,7 +118,7 @@ export default class TestRecord {
     this._id = this.timestamp + '_' + this.team + ':' + this.deliverable.deliverable + '-';
     this.orgName = testJob.orgName;
     this.username = testJob.username;
-    this.dockerContainer = testJob.test.dockerImage + ':master';
+    this.dockerImage = testJob.test.dockerImage + ':master';
     this.dockerInput = testJob.test.dockerInput;
   }
 
@@ -158,7 +158,7 @@ export default class TestRecord {
     let that = this;
     let file: string = './docker/tester/run-test-container.sh';
     let args: string[] = [
-      this.dockerContainer,
+      this.dockerImage,
       tempDir.path,
       process.env.NODE_ENV === 'development' ? '--env IS_CONTAINER_LIVE="0"' : '--env IS_CONTAINER_LIVE="1"'
     ];
@@ -285,9 +285,7 @@ public getTestRecord(): Result {
   let that = this;
     this._id += this.suiteVersion;
     let container = {
-      scriptVersion: this.scriptVersion,
-      suiteVersion: this.suiteVersion,
-      image: this.deliverable.dockerImage,
+      image: this.dockerImage,
       exitCode: this.containerExitCode
     }
 
