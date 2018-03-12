@@ -128,7 +128,7 @@ export default class DockerInput {
         dockerInput.pushInfo.projectUrl = this.pushRecord.projectUrl;
         dockerInput.pushInfo.repo = this.pushRecord.repo;
         dockerInput.pushInfo.timestamp = this.pushRecord.timestamp;
-        dockerInput.container.image = deliverable.dockerOverride === true ? 'autotest/cpsc' + this.course.courseId + '__bootstrap' : 'autotest/cpsc' + this.course.courseId + '__' + deliverable.name + '__bootstrap';
+        dockerInput.container.image = deliverable.dockerOverride === false ? 'autotest/cpsc' + this.course.courseId + '__bootstrap' : 'autotest/cpsc' + this.course.courseId + '__' + deliverable.name + '__bootstrap';
         dockerInput.dockerImage = dockerInput.container.image;
         dockerInput.teamId = this.pushRecord.team;
         dockerInput.whitelistedServers = deliverable.whitelistedServers;
