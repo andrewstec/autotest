@@ -30,7 +30,7 @@ export default class RequestRepo {
   public getLatestGradeRequest(_user: string, _deliverable: string, _repo: string, _orgName: string): Promise<CommitComment> {
     const PROCESSED = true;
     let query: object = { user: _user, deliverable: _deliverable, repo: _repo, orgName: _orgName, isProcessed: true };
-    console.log(query);
+    Log.info('RequestRepo::getLatestGradeRequest - query: ' + JSON.stringify(query));
     return new Promise<CommitComment>((fulfill, reject) => {
       try {
         db.getLatestRecord(REQUESTS_COLLECTION, query).then((latestCommitComment: CommitComment) => {

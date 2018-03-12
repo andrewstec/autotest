@@ -264,6 +264,7 @@ export default class CommitCommentContoller {
     //  jobId: job.test.image + '|'  + job.team + '#' + job.commit,
     return new Promise<number>((fulfill, reject) => {
       let jobId: string = deliverable.dockerImage + ':master' + '|' + requestDeliv + '-' + team + '#' + commit.short;
+      Log.info('CommitCommentController::isQueued() Checking Job ID: ' + jobId);
       let queue: TestJobController = TestJobController.getInstance(this.courseNum);
 
       queue.getJob(jobId).then(job => {
