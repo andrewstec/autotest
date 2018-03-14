@@ -63,18 +63,21 @@ export class MongoDB {
    * Queries a collection and returns a single matching result
    */
   async getRecord(collectionName: string, query: object): Promise<any> {
-    try {
-      return MongoDB.conn.then((db: mongodb.Db) => {
-        return db.collection(collectionName)
-          .findOne(query)
-          .then((result: JSON) => {
-            return result;
-          });
-      });
-    }
-    catch (err) {
-      Log.error(`MongoDB::getRecord() Problem querying ${collectionName}: ${err}`);
-    }
+    new Promise((fulfill, reject) => {
+      try {
+        return MongoDB.conn.then((db: mongodb.Db) => {
+          return db.collection(collectionName)
+            .findOne(query)
+            .then((result: JSON) => {
+              fulfill(result);
+            });
+        });
+      }
+      catch (err) {
+        Log.error(`MongoDB::getRecord() Problem querying ${collectionName}: ${err}`);
+        reject(err);
+      }
+    });
   }
 
     /**
