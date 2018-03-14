@@ -7,12 +7,13 @@ import UserRepo from '../../repos/UserRepo';
 import {User} from '../../model/business/UserModel';
 import {DeliverableRecord} from '../../model/settings/DeliverableRecord';
 import {Course} from '../../model/business/CourseModel';
+import DockerHelper from '../../model/docker/DockerHelper';
 import {Deliverable} from '../../model/settings/DeliverableRecord';
 import {TestJob} from '../TestJobController';
 import PushRepo from '../../repos/PushRepo';
 import CourseRepo from '../../repos/CourseRepo';
 import DeliverableRepo from '../../repos/DeliverableRepo';
-import DockerHelper, {DockerInputJSON} from '../../model/docker/DockerInput';
+import DockerInputHelper, {DockerInputJSON} from '../../model/docker/DockerInput';
 
 const BOT_USERNAME = 'autobot';
 export const INIT_STATE = 'INIT';
@@ -26,7 +27,7 @@ export default class PushController {
   private course: Course;
   private user: User;
   private record: PushRecord;
-  private dockerHelper: DockerHelper;
+  private dockerHelper: DockerInputHelper;
   private dockerInput: DockerInputJSON;
   
   constructor(courseNum: number) {
@@ -42,7 +43,7 @@ export default class PushController {
     this.course = await this.getCourse();
     this.user = await this.getUserInfo();
     this.deliverables = await new DeliverableRepo().getDeliverables(this.courseNum);
-    this.dockerHelper = await new DockerHelper(this.record, this.course, this.user);
+    this.dockerHelper = await new DockerInputHelper(this.record, this.course, this.user);
     this.dockerInput = await this.dockerHelper.createDockerInputJSON(this.deliverable);
 
     let testsToMark = [];
@@ -152,9 +153,7 @@ export default class PushController {
 
         let open: Date = new Date(deliverable.open);
         let close: Date = new Date(deliverable.close);
-        let courseImage: string = 'autotest/cpsc' + this.course.courseId + '__bootstrap';
-        let delivImage: string = 'autotest/cpsc' + this.course.courseId + '__' + this.deliverable.name + '__bootstrap';
-        let dockerImage = deliverable.dockerOverride === false ? courseImage : delivImage;
+        let dockerImage = DockerHelper.getDockerImageTag(deliverable, this.courseNum);
         let testJob: TestJob;
         if (open <= currentDate && close >= currentDate) {
             testJob = {
@@ -181,7 +180,7 @@ export default class PushController {
                 dockerInput: dockerInput,
                 dockerOverride: deliverable.dockerOverride,
                 dockerImage: dockerImage,
-                stamp: 'autotest/' + dockerImage + ':master',
+                stamp: dockerImage + ':master',
                 deliverable: deliverable.name
               }
           } 

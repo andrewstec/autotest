@@ -6,6 +6,7 @@ import {IConfig, AppConfig} from '../../Config';
 import {Database, QueryParameters, ViewResponse} from '../../model/Database';
 import CommitCommentRecord, {CommitComment} from '../../model/requests/CommitComment';
 import {GithubResponse, Commit} from '../../model/GithubUtil';
+import DockerHelper from '../../model/docker/DockerHelper';
 import PostbackController from './PostbackController'
 import {Course} from '../../model/business/CourseModel';
 import {AdminRecord, Admin} from '../../model/settings/AdminRecord';
@@ -149,14 +150,15 @@ export default class CommitCommentContoller {
                   Log.info('CommitCommentController::process() - Checking if commit is queued.')
                   let maxPos: number = await that.isQueued(deliv, record.getTeam(), record.getCommit(), deliverable)
                   let body: string;
+                  let dockerImage: string = DockerHelper.getDockerImageTag(deliv, that.courseNum);
                   try {
                     let jobIdData: JobIdData = { 
-                        dockerImage: deliv.dockerImage,
+                        dockerImage: dockerImage,
                         deliverable: req.deliverable,
                         team: req.team,
                         commit: req.commit,
                       };
-                    let jobId: string = deliv.dockerImage + ':master' + '|' + req.deliverable + '-' + req.team+ '#' + req.commit;
+                    let jobId: string = dockerImage + ':master' + '|' + req.deliverable + '-' + req.team+ '#' + req.commit;
                     await redis.client.set(reqId, req);
                     await queue.promoteJob(jobId, jobIdData, redis.client);
 
@@ -263,8 +265,8 @@ export default class CommitCommentContoller {
   private async isQueued(deliverable: Deliverable, team: string, commit: Commit, requestDeliv: string): Promise<number> {
     //  jobId: job.test.image + '|'  + job.team + '#' + job.commit,
     return new Promise<number>((fulfill, reject) => {
-      let dockerImage: string = deliverable.dockerOverride === false ? 'autotest/cpsc' + this.courseNum + '__bootstrap' : 'autotest/cpsc' + this.courseNum + '__' + deliverable.name + '__bootstrap';
-      let jobId: string = deliverable.dockerImage + ':master' + '|' + requestDeliv + '-' + team + '#' + commit.short;
+      let dockerImage: string = DockerHelper.getDockerImageTag(deliverable, this.courseNum);
+      let jobId: string = dockerImage + ':master' + '|' + requestDeliv + '-' + team + '#' + commit.short;
       Log.info('CommitCommentController::isQueued() Checking for Job ID in Queue: ' + jobId);
       let queue: TestJobController = TestJobController.getInstance(this.courseNum);
 

@@ -2,6 +2,7 @@ import Log from '../../Util';
 import {IConfig, AppConfig} from '../../Config';
 import {DeliverableRecord} from '../../model/settings/DeliverableRecord';
 import {Course} from '../../model/business/CourseModel';
+import DockerHelper from '../../model/docker/DockerHelper';
 import {Deliverable} from '../../model/settings/DeliverableRecord';
 import PushRepo from '../../repos/PushRepo';
 import CourseRepo from '../../repos/CourseRepo';
@@ -128,7 +129,7 @@ export default class DockerInput {
         dockerInput.pushInfo.projectUrl = this.pushRecord.projectUrl;
         dockerInput.pushInfo.repo = this.pushRecord.repo;
         dockerInput.pushInfo.timestamp = this.pushRecord.timestamp;
-        dockerInput.container.image = deliverable.dockerOverride === false ? 'autotest/cpsc' + this.course.courseId + '__bootstrap' : 'autotest/cpsc' + this.course.courseId + '__' + deliverable.name + '__bootstrap';
+        dockerInput.container.image = DockerHelper.getDockerImageTag(deliverable, parseInt(this.course.courseId));
         dockerInput.dockerImage = dockerInput.container.image;
         dockerInput.teamId = this.pushRecord.team;
         dockerInput.whitelistedServers = deliverable.whitelistedServers;
