@@ -130,20 +130,20 @@ export default class ResultRecordRepo {
     });
   }
 
-  public async getLatestResultRecord(_team: string, _commit: string, _deliverable: string, _orgName: string): Promise<Result> {
+  public async getResultRecord(_team: string, _commit: string, _deliverable: string, _orgName: string): Promise<Result> {
     return new Promise<Result>((fulfill, reject) => {
       let query: any = { commit: _commit, deliverable: _deliverable , team: _team, orgName: _orgName};
-
-      db.getLatestRecord(RESULTS_COLLECTION, query).then((resultRecord: Result) => {
+      return db.getRecord(RESULTS_COLLECTION, query).then((resultRecord: Result) => {
         try {
           if (!resultRecord) {
             throw `Could not find ${_orgName}, ${_team}, ${_commit}, and ${_deliverable}`;
           }
-          fulfill(resultRecord);
+          return fulfill(resultRecord);
         }
         catch (err) {
+          Log.error('ResultRecordRepo::getLatestResultRecord() ' + new Date().toString());
           Log.error(`ResultRecordRepo::getLatestResultRecord() ${err}`);
-          reject(err);
+          return reject(err);
         }
       })
     });

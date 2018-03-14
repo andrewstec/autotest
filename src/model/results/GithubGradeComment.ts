@@ -47,11 +47,10 @@ export default class GithubGradeComment {
     let that = this;
     return new Promise<Result>(async (fulfill, reject) => {
       try {
-        // important: this query has to be done in descending order to get the latest result.
-
-        // must make sure it is brought in as resultrecord 
-        let resultRecord = await resultRecordRepo.getLatestResultRecord(this.team, this.commit, this.deliverable, this.orgName);
-
+        // IMPORTANT: This query cannot be done in ascending order without slowing down async tasks
+        // that work with the queue to produce reliable Grade/CommitComment grading request results.
+        // Must be super quick. No descending/ascending sort. Only indexed ready to go stuff.
+        let resultRecord = await resultRecordRepo.getResultRecord(this.team, this.commit, this.deliverable, this.orgName);
         fulfill(resultRecord)
       } catch(err) {
         reject('Unable to get test result for ' + this.team + ' commit ' + this.commit + '. ' + err);

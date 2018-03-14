@@ -263,8 +263,9 @@ export default class CommitCommentContoller {
   private async isQueued(deliverable: Deliverable, team: string, commit: Commit, requestDeliv: string): Promise<number> {
     //  jobId: job.test.image + '|'  + job.team + '#' + job.commit,
     return new Promise<number>((fulfill, reject) => {
+      let dockerImage: string = deliverable.dockerOverride === false ? 'autotest/cpsc' + this.courseNum + '__bootstrap' : 'autotest/cpsc' + this.courseNum + '__' + deliverable.name + '__bootstrap';
       let jobId: string = deliverable.dockerImage + ':master' + '|' + requestDeliv + '-' + team + '#' + commit.short;
-      Log.info('CommitCommentController::isQueued() Checking Job ID: ' + jobId);
+      Log.info('CommitCommentController::isQueued() Checking for Job ID in Queue: ' + jobId);
       let queue: TestJobController = TestJobController.getInstance(this.courseNum);
 
       queue.getJob(jobId).then(job => {
