@@ -57,7 +57,7 @@ export default class RequestRepo {
 
     return new Promise<CommitComment>((fulfill, reject) => {
       try {
-        db.getLatestRecord(REQUESTS_COLLECTION, query).then((latestCommitComment: CommitComment) => {
+        db.getRecord(REQUESTS_COLLECTION, query).then((latestCommitComment: CommitComment) => {
           fulfill(latestCommitComment);
         });
       }

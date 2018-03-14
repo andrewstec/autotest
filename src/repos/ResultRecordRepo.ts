@@ -39,7 +39,7 @@ export default class ResultRecordRepo {
         });
       }
       catch (err) {
-        Log.error(`CommitCommentRepo::getLatestGradeRequest: ${err}`);
+        Log.error(`CommitCommentRepo::getGithubGradeComments: ${err}`);
         reject(err)
       }
     });
@@ -132,7 +132,7 @@ export default class ResultRecordRepo {
 
   public async getResultRecord(_team: string, _commit: string, _deliverable: string, _orgName: string): Promise<Result> {
     return new Promise<Result>((fulfill, reject) => {
-      let query: any = { commit: _commit, deliverable: _deliverable , team: _team, orgName: _orgName};
+      let query: any = {commit: _commit, deliverable: _deliverable , team: _team, orgName: _orgName};
 
       db.getRecord(RESULTS_COLLECTION, query).then((resultRecord: Result) => {
         try {
