@@ -28,7 +28,6 @@ export default class PostbackController {
             'Authorization': 'token ' + this.config.getGithubToken()
           }
       }
-      console.log('Postback to host: ' + this.reqOptions.host + ', path: ' + this.reqOptions.path);
     } catch(err) {
       throw 'Failed to create PostbackController. ' + err;
     }
