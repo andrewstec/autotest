@@ -130,12 +130,13 @@ export default class ResultRecordRepo {
     });
   }
 
-  public async getLatestResultRecord(_team: string, _commit: string, _deliverable: string, _orgName: string): Promise<Result> {
+  public async getResultRecord(_team: string, _commit: string, _deliverable: string, _orgName: string): Promise<Result> {
     return new Promise<Result>((fulfill, reject) => {
       let query: any = { commit: _commit, deliverable: _deliverable , team: _team, orgName: _orgName};
 
-      db.getLatestRecord(RESULTS_COLLECTION, query).then((resultRecord: Result) => {
+      db.getRecord(RESULTS_COLLECTION, query).then((resultRecord: Result) => {
         try {
+          console.log('getResultRecord result: ', resultRecord);
           if (!resultRecord) {
             throw `Could not find ${_orgName}, ${_team}, ${_commit}, and ${_deliverable}`;
           }

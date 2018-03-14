@@ -50,7 +50,7 @@ export default class GithubGradeComment {
         // important: this query has to be done in descending order to get the latest result.
 
         // must make sure it is brought in as resultrecord 
-        let resultRecord = await resultRecordRepo.getLatestResultRecord(this.team, this.commit, this.deliverable, this.orgName);
+        let resultRecord = await resultRecordRepo.getResultRecord(this.team, this.commit, this.deliverable, this.orgName);
 
         fulfill(resultRecord)
       } catch(err) {

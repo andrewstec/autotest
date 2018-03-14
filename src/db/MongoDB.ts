@@ -68,7 +68,10 @@ export class MongoDB {
         return db.collection(collectionName)
           .findOne(query)
           .then((result: JSON) => {
-            return result;
+            if (result) {
+              return result;
+            }
+            throw `Could not find Result Record under ${JSON.stringify(query)}`;
           });
       });
     }
