@@ -16,7 +16,7 @@
     "test": "mocha --recursive",
     "deploy": "env $(cat autotest.env | xargs) ./deploy.sh",
     "start:dev": "./deploy.sh && node src/App.js",
-    "start:prod": "./deploy.sh && forever start --minUptime 1000 --spinSleepTime 1000 -l LOGFILE -o OUTPUT -e ERRFILE --append src/App.js  "
+    "start:prod": "./deploy.sh && NODE_ENV='production' forever start --minUptime 1000 --spinSleepTime 1000 -l LOGFILE -o OUTPUT -e ERRFILE --append src/App.js  "
   },
   "devDependencies": {
     "@types/bull": "^1.0.31",
