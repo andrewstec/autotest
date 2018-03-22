@@ -98,6 +98,7 @@ export default class TestRecord {
   private username: string;
   private dockerInput: DockerInputJSON;
   private dockerImage: string;
+  private testRecord: Result;
 
   constructor(githubToken: string, testJob: TestJob) {
     this.courseNum = testJob.courseNum;
@@ -149,12 +150,71 @@ export default class TestRecord {
   public getTestReport(): any {
     return this.testReport;
   }
+  
+  public getTestRecord(): Result {
+    return this.testRecord;
+  }
+
+  public createTestRecord(): Result {
+    Log.info(`TestRecord::getTestRecord() INFO - start`);
+    
+    let that = this;
+      this._id += this.suiteVersion;
+      let container = {
+        image: this.dockerImage,
+        exitCode: this.containerExitCode
+      }
+
+      function getDockerInput() {
+        if (that.dockerInput) {
+          let attachment = {name: 'docker_SHA.json', data: that.dockerInput, content_type: 'application/json'};
+          return attachment;
+        } 
+        return null;
+      }
+      
+      let doc: Result;
+
+      try {
+        doc = {
+          'team': this.team,
+          'repo': this.repo,
+          'state': this.state,
+          'projectUrl': this.projectUrl,
+          'commitUrl': this.commitUrl,
+          'courseNum': this.courseNum,
+          'orgName': this.orgName,
+          'deliverable': this.deliverable.deliverable,
+          'user': this.username,
+          'report': null,
+          'commit': this.commit,
+          'committer': this.committer,
+          'timestamp': this.timestamp,
+          'postbackOnComplete': true, // if a timeout occurs, this error will postback by default,
+          'container': container,
+          'requestor': this.requestor,
+          'gradeRequested': false,
+          'githubFeedback': GITHUB_TIMEOUT_MSG,
+          'gradeRequestedTimestamp': -1,
+          'ref': this.ref,
+          'stdioRef': that.dockerInput.stdioRef,
+          'attachments': [getDockerInput()],
+        }
+        Log.info(`TestRecord::createTestRecord() INFO - Created TestRecord to save in case of Timeout on commit ${this.commit} and user ${this.username}`);
+        // instead of returning, it should be entered into the Database.
+      }
+      catch(err) {
+        Log.error(`TestRecord::createTestRecord() - ERROR ${err}`)
+      }
+      return doc;
+    }
 
   public async generate(): Promise<TestInfo> {
     // this.dockerInput input will be accessible in mounted volume of Docker container as /output/docker_SHA.json
+    this.testRecord = this.createTestRecord();
     let tempDir = await tmp.dir({ dir: '/tmp', unsafeCleanup: true });
-    await this.writeContainerInput(tempDir, this.dockerInput);    
-    Log.info('TestRecord:: generate() ' + JSON.stringify(this.dockerInput));
+    await this.writeContainerInput(tempDir, this.dockerInput, this.testRecord);    
+    Log.info('TestRecord:: generate() - start - run-test-container.sh for ' + this.deliverable.deliverable + ' and ' + this.commit + ' : ' + JSON.stringify(this.dockerInput));
     let that = this;
     let file: string = './docker/tester/run-test-container.sh';
     let args: string[] = [
@@ -218,10 +278,11 @@ export default class TestRecord {
         promises.push(readTranscript);
 
         Promise.all(promises).then((err) => {
+          
           let testInfo: TestInfo = {
             testRecord: that.getTestRecord(),
             stdioLog: that.getStdio(),
-            containerExitCode: this.containerExitCode,
+            containerExitCode: that.containerExitCode,
             processErrors: err
           }
 
@@ -262,10 +323,11 @@ export default class TestRecord {
     }
   }
 
-  public writeContainerInput(tmpDir: any, dockerInput: object) {
-    new Promise((fulfill, reject) => {
+  public writeContainerInput(tmpDir: any, dockerInput: object, resultRecord: Result) {
+    let that = this;
+    return new Promise((fulfill, reject) => {
       try {
-        Log.info(`TestRecord::writeContainerInput Writing 'docker_SHA.json' file in container volume`);
+        Log.info(`TestRecord::writeContainerInput() Writing 'docker_SHA.json' file in container volume`);
         fs.writeFile(tmpDir.path + '/docker_SHA.json', JSON.stringify(dockerInput), (err) => {
           if (err) {
             throw err;
@@ -274,62 +336,24 @@ export default class TestRecord {
           }
         });   
       } catch (err) {
-        Log.error(`TestRecord::writeDockerJSON() ERROR ${err}`);
+        Log.error(`TestRecord::writeContainerInput() docker_SHA.json ERROR ${err}`);
       }
+    })
+    .then(() => {
+      return new Promise((fulfill, reject) => {
+        try {
+          Log.info(`TestRecord::writeContainerInput() Writing 'result_record.json' file in container volume`);
+          fs.writeFile(tmpDir.path + '/result_record.json', JSON.stringify(resultRecord), (err) => {
+            if (err) {
+              throw err;
+            } else {
+              return fulfill();
+            }
+          });   
+        } catch (err) {
+          Log.error(`TestRecord::writeDockerJSON() result_record.json ERROR ${err}`);
+        }
+      });
     });
-  }
-
-public getTestRecord(): Result {
-  Log.info(`TestRecord::getTestRecord() INFO - start`);
-  
-  let that = this;
-    this._id += this.suiteVersion;
-    let container = {
-      image: this.dockerImage,
-      exitCode: this.containerExitCode
-    }
-
-    function getDockerInput() {
-      if (that.dockerInput) {
-        let attachment = {name: 'docker_SHA.json', data: that.dockerInput, content_type: 'application/json'};
-        return attachment;
-      } 
-      return null;
-    }
-    
-    let doc: Result;
-
-    try {
-       doc = {
-        'team': this.team,
-        'repo': this.repo,
-        'state': this.state,
-        'projectUrl': this.projectUrl,
-        'commitUrl': this.commitUrl,
-        'courseNum': this.courseNum,
-        'orgName': this.orgName,
-        'deliverable': this.deliverable.deliverable,
-        'user': this.username,
-        'report': null,
-        'commit': this.commit,
-        'committer': this.committer,
-        'timestamp': this.timestamp,
-        'postbackOnComplete': true, // if a timeout occurs, this error will postback by default,
-        'container': container,
-        'requestor': this.requestor,
-        'gradeRequested': false,
-        'githubFeedback': GITHUB_TIMEOUT_MSG,
-        'gradeRequestedTimestamp': -1,
-        'ref': this.ref,
-        'stdioRef': that.dockerInput.stdioRef,
-        'attachments': [getDockerInput()],
-      }
-      Log.info(`TestRecord::getTestRecord() INFO - Created TestRecord to save in case of Timeout on commit ${this.commit} and user ${this.username}`);
-      // instead of returning, it should be entered into the Database.
-    }
-    catch(err) {
-      Log.error(`TestRecord::getTestRecord() - ERROR ${err}`)
-    }
-    return doc;
   }
 }
