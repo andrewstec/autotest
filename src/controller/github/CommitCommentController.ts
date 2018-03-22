@@ -129,19 +129,28 @@ export default class CommitCommentContoller {
             let diff: number = +new Date() - +lastRequest;
             if (diff > record.getDeliverableRate() || isAdmin) {
               try {
-                let githubGradeComment: GithubGradeComment = new GithubGradeComment(record.getTeam(), record.getCommit().short, record.getDeliverable(), this.record.getOrgName(), this.record.getNote());
-                await githubGradeComment.fetch();
-                let postbackOnComplete: boolean = githubGradeComment.getPostbackOnComplete()
-                if (githubGradeComment.getPostbackOnComplete()) {
-                  // postback on complete is a freebie, such as if a build fails, and does not count as a request even if they make a request
-                  record.setIsProcessed(false); 
+                // If Grade is available for marking, give them feedback
+                let now = new Date().getTime();
+                if ((now < deliv.close && now >= deliv.open) || isAdmin) {
+                  let githubGradeComment: GithubGradeComment = new GithubGradeComment(record.getTeam(), record.getCommit().short, record.getDeliverable(), this.record.getOrgName(), this.record.getNote());
+                  await githubGradeComment.fetch();
+                  let postbackOnComplete: boolean = githubGradeComment.getPostbackOnComplete()
+                  if (githubGradeComment.getPostbackOnComplete()) {
+                    // postback on complete is a freebie, such as if a build fails, and does not count as a request even if they make a request
+                    record.setIsProcessed(false); 
+                  } else {
+                    record.setIsProcessed(true);
+                  }
+                  let githubFeedback: string = await githubGradeComment.formatResult();
+                  response = {
+                    statusCode: 200,
+                    body: githubFeedback
+                  }
                 } else {
-                  record.setIsProcessed(true);
-                }
-                let githubFeedback: string = await githubGradeComment.formatResult();
-                response = {
-                  statusCode: 200,
-                  body: githubFeedback
+                  response = {
+                    statusCode: 200,
+                    body: 'This assignment is currently not open for grading.'
+                  }
                 }
               } catch(err) {
                 Log.info('CommitCommentController::process() - No results for request.');

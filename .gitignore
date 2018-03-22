@@ -2,6 +2,8 @@
 *.js
 *.env
 *.log
+ERRFILE
+OUTPUT
 
 # Directories
 dbdata

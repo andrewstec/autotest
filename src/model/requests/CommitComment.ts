@@ -105,7 +105,14 @@ export default class CommitCommentRecord {
     return new Promise<FetchedDeliverable>(async (fulfill, reject) => {
       try {
         let deliverableRepo = new DeliverableRepo();
-        let deliverable: Deliverable = await deliverableRepo.getDeliverable(key, courseNum);
+        let deliverable: Deliverable = await deliverableRepo.getDeliverable(key, courseNum)
+          .then((deliv) => {
+            return deliv;
+          })
+          .catch((err) => {
+            Log.info('Deliverable not explicitly requested.');
+            return null;
+          })
         let deliverables: Deliverable[] = await deliverableRepo.getDeliverables(this.courseNum);
         let fetchedDeliverables: FetchedDeliverable[] = [];
         let now: Date = new Date();
@@ -123,21 +130,21 @@ export default class CommitCommentRecord {
           } else if (new Date(deliverable.open) >= now && new Date(deliverable.close) >= now) {
             let date = Moment(deliverable.open).format('MMMM Do YYYY, h:mm:ss a');
             this.note = `The deliverable '${key}' has not been released. Please wait until ${date}.`;
-            for (const deliv of deliverables) {
-              if (new Date(deliv.open) <= now && new Date(deliv.close) >= now) {
-                fetchedDeliverables.push({key: key, deliverable: deliv});
-              }
-            }
+            console.log('a vaild deliverable that hasnt been released');
+                return fulfill({
+                  key: key,
+                  deliverable: deliverable
+                })
           // The key refers to a vaild deliverable that has been released but has been closed
           // Get all such deliverables
           } else if (new Date(deliverable.open) <= now && new Date(deliverable.close) >= now) {
             let date = Moment(deliverable.close).format('MMMM Do YYYY, h:mm:ss a');
             this.note = `The deliverable '${key}' is closed; The due date was ${date}.`;
-            for (const deliv of deliverables) {
-              if (new Date(deliv.open) <= now && new Date(deliv.close) >= now) {
-                fetchedDeliverables.push({key: key, deliverable: deliv});
-              }
-            }
+            console.log('vaild deliverable that has been released but has been closed');
+            return fulfill({
+              key: key,
+              deliverable: deliverable
+            });
           }
           // The key refers to an invaild deliverable
           // Get all deliverables that have been released
@@ -145,17 +152,24 @@ export default class CommitCommentRecord {
           if (!this.note)
             this.note = 'Invalid deliverable specified; using latest. To specify an earlier deliverable, follow the metion with `#dX`, where `X` is the deliverable.';
           for (const deliv of deliverables) {
+            console.log(deliv.open);
+            console.log(new Date(deliv.open) <= now);
             if (new Date(deliv.open) <= now) {
+              console.log('new deliv' + deliv);
               fetchedDeliverables.push({key: key, deliverable: deliv});
             }
           }
         }
         // Of the released deliverables, return the one with the latest due date
+        console.log('fetched deelivs', fetchedDeliverables);
+        deliverables.map((deliverable) => {
+          fetchedDeliverables.push({key: key, deliverable: deliverable});
+        });
         let latestDeliverable: FetchedDeliverable = fetchedDeliverables.reduce((prev, current) => {
           return (prev.deliverable.close > current.deliverable.close) ? prev : current
         }, fetchedDeliverables[0]);
-
-        fulfill(latestDeliverable);
+        Log.info('CommitComment:: Latest Deliverable found for ' + courseNum + ': ' + latestDeliverable);
+        return fulfill(latestDeliverable);
       } catch(err) {
           Log.error(`CommitComment::fulfill(latestDeliverable) ${err}`);
       }
