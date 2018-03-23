@@ -3,7 +3,6 @@ import tmp = require('tmp');
 import Log from '../Util';
 import fs = require('fs');
 import {IConfig, AppConfig} from '../Config';
-import {Database} from '../model/Database';
 import TestRecord from '../model/results/TestRecord';
 import {TestJob} from './TestJobController';
 import TestRecordRepo from '../repos/TestRecordRepo';

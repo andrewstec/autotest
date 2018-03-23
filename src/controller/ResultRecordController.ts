@@ -3,7 +3,6 @@ import tmp = require('tmp');
 import Log from '../Util';
 import fs = require('fs');
 import {IConfig, AppConfig} from '../Config';
-import {Database} from '../model/Database';
 import TestRecord from '../model/results/TestRecord';
 import {TestJob} from './TestJobController';
 import ResultRecordRepo from '../repos/ResultRecordRepo';
@@ -12,7 +11,6 @@ import ResultRecord, {ResultPayload, Result} from '../model/results/ResultRecord
 
 export default class ResultRecordController {
   private config: IConfig;
-  private resultsDB: Database;
   private courseNum: number;
   private _resultRecord: ResultRecord;
 

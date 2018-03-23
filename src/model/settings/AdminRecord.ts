@@ -1,4 +1,3 @@
-import {DatabaseRecord, CouchDatabase, InsertResponse} from '../Database';
 import {GithubUsername, GithubAccount} from '../GithubUtil';
 
 export enum Role {

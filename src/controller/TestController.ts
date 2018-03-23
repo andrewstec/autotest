@@ -3,7 +3,6 @@ import tmp = require('tmp');
 import fs = require('fs');
 import Log from '../Util';
 import {IConfig, AppConfig} from '../Config';
-import {Database} from '../model/Database';
 import TestRecord, {TestInfo} from '../model/results/TestRecord';
 import {TestJob} from './TestJobController';
 import ResultRecordRepo from '../repos/ResultRecordRepo';
@@ -13,7 +12,6 @@ import StdioRecordRepo, {StdioRecord} from '../repos/StdioRecordRepo';
 
 export default class TestController {
   private config: IConfig;
-  private resultsDB: Database;
   private testJob: TestJob
   private testRecord: TestRecord;
 

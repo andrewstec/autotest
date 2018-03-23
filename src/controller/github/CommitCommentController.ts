@@ -3,7 +3,6 @@ import * as Url from 'url'
 
 import Log from '../../Util';
 import {IConfig, AppConfig} from '../../Config';
-import {Database, QueryParameters, ViewResponse} from '../../model/Database';
 import CommitCommentRecord, {CommitComment} from '../../model/requests/CommitComment';
 import {GithubResponse, Commit} from '../../model/GithubUtil';
 import DockerHelper from '../../model/docker/DockerHelper';

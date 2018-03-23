@@ -1,11 +1,5 @@
 import * as Url from 'url';
-
 import {Commit} from '../GithubUtil';
-import {DatabaseRecord, CouchDatabase, InsertResponse} from '../Database';
-
-interface IDictionary<T> {
-
-}
 
 export interface Deliverable {
   _id: string;

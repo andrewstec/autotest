@@ -3,7 +3,6 @@ import * as Moment from 'moment';
 
 import Log from '../../Util';
 import {IConfig, AppConfig} from '../../Config';
-import {Database, CouchDatabase, DatabaseRecord, InsertResponse} from '../Database';
 import {GithubUtil, Commit} from '../GithubUtil';
 import {Deliverable, DeliverableRecord} from '../settings/DeliverableRecord';
 import db from '../../db/MongoDB';

@@ -4,7 +4,6 @@ import fs = require('fs');
 import {IConfig, AppConfig} from '../../Config';
 import {Commit} from '../GithubUtil';
 import {Course} from '../../model/business/CourseModel';
-import {CouchDatabase,Database, DatabaseRecord, InsertResponse} from '../Database';
 import {Result} from '../results/ResultRecord';
 import {TestJob, TestJobDeliverable} from '../../controller/TestJobController';
 import DockerInput, { DockerInputJSON } from '../../model/docker/DockerInput';
@@ -214,7 +213,7 @@ export default class TestRecord {
     this.testRecord = this.createTestRecord();
     let tempDir = await tmp.dir({ dir: '/tmp', unsafeCleanup: true });
     await this.writeContainerInput(tempDir, this.dockerInput, this.testRecord);    
-    Log.info('TestRecord:: generate() - start - run-test-container.sh for ' + this.deliverable.deliverable + ' and ' + this.commit + ' : ' + JSON.stringify(this.dockerInput));
+    Log.info('TestRecord:: generate() - start - run-test-container.sh for ' + this.deliverable.deliverable + ' and ' + this.commit + '.');
     let that = this;
     let file: string = './docker/tester/run-test-container.sh';
     let args: string[] = [
@@ -327,7 +326,7 @@ export default class TestRecord {
     let that = this;
     return new Promise((fulfill, reject) => {
       try {
-        Log.info(`TestRecord::writeContainerInput() Writing 'docker_SHA.json' file in container volume`);
+        Log.info(`TestRecord::writeContainerInput() Writing 'docker_SHA.json' file in container volume: ` + JSON.stringify(dockerInput));
         fs.writeFile(tmpDir.path + '/docker_SHA.json', JSON.stringify(dockerInput), (err) => {
           if (err) {
             throw err;
@@ -342,7 +341,7 @@ export default class TestRecord {
     .then(() => {
       return new Promise((fulfill, reject) => {
         try {
-          Log.info(`TestRecord::writeContainerInput() Writing 'result_record.json' file in container volume`);
+          Log.info(`TestRecord::writeContainerInput() Writing 'result_record.json' file in container volume: ` + JSON.stringify(resultRecord));
           fs.writeFile(tmpDir.path + '/result_record.json', JSON.stringify(resultRecord), (err) => {
             if (err) {
               throw err;

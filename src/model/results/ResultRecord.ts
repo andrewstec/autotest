@@ -1,6 +1,5 @@
 import Log from '../../Util';
 import {IConfig, AppConfig} from '../../Config';
-import {Database, QueryParameters, ViewResponse} from '../../model/Database';
 import TestRecord, {Attachment} from '../../model/results/TestRecord'
 import TestRecordRepo from '../../repos/TestRecordRepo';
 
