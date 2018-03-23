@@ -219,7 +219,7 @@ export default class TestRecord {
     let args: string[] = [
       this.dockerImage,
       tempDir.path,
-      process.env.NODE_ENV === 'development' ? '--env IS_CONTAINER_LIVE="0"' : '--env IS_CONTAINER_LIVE="1"'
+      process.env.NODE_ENV === 'production' ? '--env IS_CONTAINER_LIVE="1"' : '--env IS_CONTAINER_LIVE="0"'
     ];
     let options = {
       encoding: 'utf8'
