@@ -117,6 +117,7 @@ export default class RouteHandler {
     let body = req.body;
     let serverPort = RequestHelper.parseServerPort(req);
     let currentCourseNum = RequestHelper.parseCourseNum(serverPort);
+    console.log(req.body);
     let controller: ResultRecordController = new ResultRecordController(currentCourseNum, req.body)
     let resultPayload: ResultPayload = req.body as ResultPayload;
     controller.store()

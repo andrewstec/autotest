@@ -221,7 +221,6 @@ export default class TestRecord {
       tempDir.path,
       process.env.NODE_ENV === 'development' ? '--env IS_CONTAINER_LIVE="0"' : '--env IS_CONTAINER_LIVE="1"'
     ];
-    Log.info('TestRecord:: generate() Test Arguments' + JSON.stringify(args));
     let options = {
       encoding: 'utf8'
     }
@@ -231,6 +230,8 @@ export default class TestRecord {
         if (error) {
           Log.error('TestRecord::execFile() ERROR ' + error);
           this.containerExitCode = error.code;
+        } else {
+          Log.info('TestRecord::execFile() CMD: ' + file + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
         }
 
         let promises: Promise<string>[] = [];
