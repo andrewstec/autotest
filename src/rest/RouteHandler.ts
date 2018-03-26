@@ -114,10 +114,10 @@ export default class RouteHandler {
    *  - req should container ResultRecord container with payload
    */
   public static resultSubmission(req: restify.Request, res: restify.Response, next: restify.Next) {
+    Log.info('RouteHandler::resultSubmission() - start');
     let body = req.body;
     let serverPort = RequestHelper.parseServerPort(req);
     let currentCourseNum = RequestHelper.parseCourseNum(serverPort);
-    console.log(req.body);
     let controller: ResultRecordController = new ResultRecordController(currentCourseNum, req.body)
     let resultPayload: ResultPayload = req.body as ResultPayload;
     controller.store()
