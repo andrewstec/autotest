@@ -85,7 +85,7 @@ export class MongoDB {
       try {
         MongoDB.conn.then((db: mongodb.Db) => {
           db.collection(collectionName)
-            .findOne(query, {sort: {"$natural": -1}})
+            .findOne(query)
             .then((result: JSON) => {
               fulfill(result);
             });
