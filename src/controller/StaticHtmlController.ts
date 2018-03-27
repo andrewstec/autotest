@@ -57,7 +57,7 @@ export default class StaticHtml {
         }
         fs.writeFileSync(zipFilePath, zipFile);
       } catch (err) {
-        Log.error('StaticHtmlController:: Base64 Decoding zipFile.data ERROR ' + );
+        Log.error('StaticHtmlController:: Base64 Decoding zipFile.data ERROR for target: ' + zipFilePath);
         throw err;
       }
 
