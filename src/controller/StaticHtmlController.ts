@@ -67,7 +67,7 @@ export default class StaticHtml {
           reject('Error creating Static Html Hyperlink ' + err);
         } else {
           Log.info('StaticHtmlController:: extractZipToDir() SUCCESS Extracted StaticHtml to ' + path);
-          fulfill('https://portal.cs.ubc.ca/static/' + that.newDirPath + '/html/');
+          fulfill('https://' + window.location.hostname + '/static/' + that.newDirPath + '/html/');
         }
        });
     });
