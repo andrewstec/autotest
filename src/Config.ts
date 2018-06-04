@@ -6,6 +6,7 @@ import * as Url from 'url';
 
 export interface IConfig {
   getAppPort(): number;
+  getAppHost(): string;
   getRedisAddress(): Url.Url;
   getMentionTag(): string;
   getGithubToken(): string;
@@ -25,6 +26,7 @@ export interface IConfig {
 class Config {
   private static instance: Config;
   private appPort: number;
+  private appHost: string;
   private redisAddress: Url.Url;
   private mentionTag: string;
   private githubToken: string;
@@ -43,6 +45,7 @@ class Config {
     let nodeEnv = process.env.NODE_ENV || 'development';
     let courses = process.env.COURSES.split(" ");
     let appPort = process.env.APP_PORT || 11311;
+    let appHost = process.env.APP_HOST || 'portal.cs.ubc.ca';
     let dbInstance = process.env.DB_INSTANCE || 'http://localhost:5984';
     let dbAppUser = process.env.DB_APP_USERNAME;
     let dbAppPass = process.env.DB_APP_PASSWORD;
@@ -120,6 +123,10 @@ class Config {
     return this.appPort
   }
 
+  public getAppHost(): string {
+    return this.appHost;
+  }
+
   public getMongoAddress(): string {
     return this.mongoDB;
   }
@@ -147,6 +154,9 @@ export class AppConfig implements IConfig {
   }
   public getAppPort(): number {
     return Config.getInstance().getAppPort();
+  }
+  public getAppHost(): string {
+    return Config.getInstance().getAppHost();
   }
   public getNodeEnv(): string {
     return Config.getInstance().getNodeEnv();
