@@ -10,6 +10,7 @@ import ResultRecord, {ResultPayload, Result} from '../model/results/ResultRecord
 
 const JSZip = require('jszip');
 const STATIC_HOST_PATH = new AppConfig().getStaticHtmlPath();
+const APP_HOST = new AppConfig().getAppHost();
 const extract = require('extract-zip');
 
 
@@ -67,7 +68,7 @@ export default class StaticHtml {
           reject('Error creating Static Html Hyperlink ' + err);
         } else {
           Log.info('StaticHtmlController:: extractZipToDir() SUCCESS Extracted StaticHtml to ' + path);
-          fulfill('https://portal.cs.ubc.ca/static/' + that.newDirPath + '/html/');
+          fulfill('https://' + APP_HOST + '/static/' + that.newDirPath + '/html/');
         }
        });
     });
